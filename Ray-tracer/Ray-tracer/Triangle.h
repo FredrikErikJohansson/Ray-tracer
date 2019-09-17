@@ -25,6 +25,10 @@ public:
 		normal = _normal;
 	}
 
+	void setColor(ColorDbl _color) {
+		color = _color;
+	}
+
 
 private:
 	Vertex v0, v1, v2;

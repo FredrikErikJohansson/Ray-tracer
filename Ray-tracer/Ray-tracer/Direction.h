@@ -5,7 +5,7 @@ class Direction
 public:
 	Direction();
 
-	Direction(int _x, int _y, int _z) {
+	Direction(double _x, double _y, double _z) {
 		x = _x;
 		y = _y;
 		z = _z;
@@ -14,8 +14,8 @@ public:
 	~Direction();
 
 private:
-	int x;
-	int y;
-	int z;
+	double x;
+	double y;
+	double z;
 };
 

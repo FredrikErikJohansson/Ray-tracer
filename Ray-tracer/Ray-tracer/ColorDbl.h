@@ -3,6 +3,13 @@ class ColorDbl
 {
 public:
 	ColorDbl();
+
+	ColorDbl(double _red, double _green, double _blue) {
+		red = _red;
+		green = _green;
+		blue = _blue;
+	}
+
 	~ColorDbl();
 
 	double getRed() {
