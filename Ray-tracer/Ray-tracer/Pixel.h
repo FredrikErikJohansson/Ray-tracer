@@ -13,6 +13,10 @@ public:
 		return color;
 	}
 
+	void setColor(double _red, double _green, double _blue) {
+		color = ColorDbl(_red, _green, _blue);
+	}
+
 private:
 	ColorDbl color;
 	Ray ray;

@@ -2,8 +2,8 @@
 
 #include <iostream>
 #include <fstream>
+#include <vector>
 
-#include "glm/glm.hpp"
 #include "Vertex.h"
 #include "Pixel.h"
 
@@ -15,17 +15,19 @@ public:
 	Camera();
 	~Camera();
 
-	void render() {
-		//Launch ray... each pixel
-	}
+	void render();
 
 	void createImage();
 
+	void setEye(int _eye);
+
 private:
-	Vertex eye00;
-	Vertex eye01;
+	Vertex eye00 = Vertex(-2,0,0,1);
+	Vertex eye01 = Vertex(-1,0,0,1);
 	int eyeSwitch;
 
 	Pixel image[SIZE][SIZE];
+	//std::array<std::array<Pixel, SIZE>, SIZE> image;
+	//std::vector<std::vector<Pixel>> x(std::vector<int>(500)), 5000);
 };
 

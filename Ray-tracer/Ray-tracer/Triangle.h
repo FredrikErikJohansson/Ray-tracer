@@ -11,9 +11,7 @@ public:
 	Triangle();
 	~Triangle();
 
-	void rayIntersection(Ray arg) {
-		//MÖLLER-trumbore
-	}
+	bool rayIntersection(Ray arg);
 
 	void setVertices(Vertex _v0, Vertex _v1, Vertex _v2) {
 		v0 = _v0;

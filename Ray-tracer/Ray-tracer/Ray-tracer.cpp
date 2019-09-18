@@ -1,12 +1,22 @@
 // Ray-tracer.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-#include "pch.h"
+#include "Scene.h"
+#include "Camera.h"
+#include "Pixel.h"
 #include <iostream>
 
 int main()
 {
-    std::cout << "Hello World!\n"; 
+	Scene scene;
+
+	Camera camera;
+	
+	scene.createScene();
+		
+	camera.setEye(0);
+	camera.render();
+	camera.createImage();
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu

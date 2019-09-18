@@ -4,7 +4,7 @@ class Vertex
 public:
 	Vertex();
 
-	Vertex(int _x, int _y, int _z, int _w) {
+	Vertex(double _x, double _y, double _z, double _w) {
 		x = _x;
 		y = _y;
 		z = _z;
@@ -14,9 +14,9 @@ public:
 	~Vertex();
 
 private:
-	int x;
-	int y;
-	int z;
-	int w;
+	double x;
+	double y;
+	double z;
+	double w;
 };
 
