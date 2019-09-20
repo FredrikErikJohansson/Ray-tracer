@@ -1,5 +1,4 @@
 #include "Camera.h"
-#include "glm/glm.hpp"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -12,19 +11,6 @@ Camera::~Camera()
 {
 }
 
-/*
-void Camera::createImage() {
-
-	std::ofstream myfile;
-	myfile.open("example.txt");
-
-	for (int i = 0; i < SIZE; i++) {
-		for (int j = 0; j < SIZE; j++) {
-			myfile << image[i][j].getColor().getRed() << std::endl;
-		}
-	}
-	myfile.close();
-}*/
 
 void Camera::createImage() {
 
@@ -35,29 +21,35 @@ void Camera::createImage() {
 		for (int j = 0; j < SIZE; ++j)
 		{
 			static unsigned char color[3];
-			color[0] = image[i][j].getColor().getRed();  /* red */
-			color[1] = image[i][j].getColor().getGreen();  /* green */
-			color[2] = image[i][j].getColor().getBlue();  /* blue */
+			color[0] = image[i][j].getColor().x;  /* red */
+			color[1] = image[i][j].getColor().y;  /* green */
+			color[2] = image[i][j].getColor().z;  /* blue */
 			fwrite(color, 1, 3, fp);
 		}
 	}
 	fclose(fp);
 }
 
-void Camera::render() {
+void Camera::render(Scene scene) {
 	double currentPixelZ = 0.99875;
 	double currentPixelY = -0.99875;
 
 	for (int i = 0; i < SIZE; i++) {
+		//std::cout << i << std::endl;
 		for (int j = 0; j < SIZE; j++) {
 
+			Ray ray;
+
 			if(eyeSwitch == 0)
-				Ray ray = Ray(eye00, Vertex(0,currentPixelY,currentPixelZ,1));
-			else Ray ray = Ray(eye01, Vertex(0,currentPixelY,currentPixelZ,1));
+				ray = Ray(eye00, glm::vec4(0,currentPixelY,currentPixelZ,1));
+			else ray = Ray(eye01, glm::vec4(0,currentPixelY,currentPixelZ,1));
 
 			//Follow the ray
 			//and then give image some values
-			image[i][j].setColor(255, 0, 0); //This is for test
+			glm::vec3 pixelColor = scene.getIntersectedTriangle(ray).getColor();
+
+			image[i][j].setColor(pixelColor.x * 256, pixelColor.y * 256, pixelColor.z * 256);
+			std::cout << "Red: " << image[i][j].getColor().x << " Green: " << image[i][j].getColor().y << " Blue: " << image[i][j].getColor().z << std::endl;
 
 			currentPixelY += currentPixelY + 0.0025;
 		}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <iostream>
 
 #include "Triangle.h"
 #include "Ray.h"
@@ -12,7 +13,7 @@ public:
 	~Scene();
 
 	//something like this
-	//void getIntersection();
+	Triangle& getIntersectedTriangle(Ray ray);
 
 	void createScene();
 

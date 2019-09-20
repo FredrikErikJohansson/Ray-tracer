@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Vertex.h"
-#include "ColorDbl.h"
-#include "Direction.h"
+#include <iostream>
+
+#include "glm/glm.hpp"
 #include "Ray.h"
 
 class Triangle
@@ -13,24 +13,28 @@ public:
 
 	bool rayIntersection(Ray arg);
 
-	void setVertices(Vertex _v0, Vertex _v1, Vertex _v2) {
+	glm::vec3 getColor() {
+		return color;
+	}
+
+	void setVertices(glm::vec4 _v0, glm::vec4 _v1, glm::vec4 _v2) {
 		v0 = _v0;
 		v1 = _v1;
 		v2 = _v2;
 	}
 
-	void setNormal(Direction _normal) {
+	void setNormal(glm::vec3 _normal) {
 		normal = _normal;
 	}
 
-	void setColor(ColorDbl _color) {
+	void setColor(glm::vec3 _color) {
 		color = _color;
 	}
 
 
 private:
-	Vertex v0, v1, v2;
-	ColorDbl color;
-	Direction normal;
+	glm::vec4 v0, v1, v2;
+	glm::vec3 color;
+	glm::vec3 normal;
 };
 
