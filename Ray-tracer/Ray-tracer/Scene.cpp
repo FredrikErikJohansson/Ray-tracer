@@ -15,12 +15,12 @@ void Scene::createScene() {
 	triangles[5].setVertices(glm::vec4(0, 6, -5, 1), glm::vec4(5, 0, -5, 1), glm::vec4(-3, 0, -5, 1));
 
 	//Floor colors
-	triangles[0].setColor(glm::vec3(1, 1, 0));
-	triangles[1].setColor(glm::vec3(1, 1, 0));
-	triangles[2].setColor(glm::vec3(1, 1, 0));
-	triangles[3].setColor(glm::vec3(1, 1, 0));
-	triangles[4].setColor(glm::vec3(1, 1, 0));
-	triangles[5].setColor(glm::vec3(1, 1, 0));
+	triangles[0].setColor(glm::vec3(1, 1, 1));
+	triangles[1].setColor(glm::vec3(1, 1, 1));
+	triangles[2].setColor(glm::vec3(1, 1, 1));
+	triangles[3].setColor(glm::vec3(1, 1, 1));
+	triangles[4].setColor(glm::vec3(1, 1, 1));
+	triangles[5].setColor(glm::vec3(1, 1, 1));
 
 	//Floor normals
 	triangles[0].setNormal(glm::vec3(0, 0, 1));
@@ -110,9 +110,12 @@ Scene::~Scene()
 
 Triangle Scene::getIntersectedTriangle(Ray ray) {
 	for (int i = 0; i < 24; i++) {
-		if (triangles[i].rayIntersection(ray)) {
-			return triangles[i];
-		}
+		//Check if ray is infront of the triangle
+		//This does not work properly
+		//if (acos(glm::dot(ray.getDirection(), triangles[i].getNormal())) < 90.0f) {
+			if (triangles[i].rayIntersection(ray)) {
+				return triangles[i];
+			}
+		//}
 	}
-	//return triangles[0];
 }

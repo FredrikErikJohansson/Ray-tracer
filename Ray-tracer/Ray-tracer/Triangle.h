@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <math.h>
 
 #include "glm/glm.hpp"
 #include "Ray.h"
@@ -15,6 +16,10 @@ public:
 
 	glm::vec3 getColor() {
 		return color;
+	}
+
+	glm::vec3 getNormal() {
+		return glm::normalize(normal);
 	}
 
 	float getBrightness() {

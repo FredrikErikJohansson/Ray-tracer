@@ -11,7 +11,6 @@ Camera::~Camera()
 {
 }
 
-
 void Camera::createImage() {
 
 	FILE *fp = fopen("rendering.ppm", "wb"); /* b - binary mode */
@@ -31,28 +30,32 @@ void Camera::createImage() {
 }
 
 void Camera::render(Scene scene) {
-	for (int i = 0; i < SIZE; i++) {
-		std::cout << i << "/" << SIZE << std::endl;
-		for (int j = 0; j < SIZE; j++) {
+	float maxVal = 0;
 
+	for (int i = 0; i < SIZE; i++) {
+		if ( i % 79 == 0 ) std::cout << i + 1 << "/" << SIZE << std::endl;
+		for (int j = 0; j < SIZE; j++) {
 			Ray ray;
-			glm::vec3 currentPixel = (glm::vec3(eye01) + glm::vec3(0, i*0.0025 - 0.99875, j*0.0025 - 0.99875) - glm::vec3(eye01));
+			glm::vec3 currentPixel = (glm::vec3(eye01) + glm::vec3(0, i*0.0025f - 0.99875f, j*0.0025f - 0.99875f) - glm::vec3(eye01));
 			ray = Ray(eye01, glm::vec4(currentPixel, 1));
 
-			//if(eyeSwitch == 0)
-				//ray = Ray(eye00, glm::vec4(0,currentPixelY,currentPixelZ,1));
-			//else ray = Ray(eye01, glm::vec4(0,currentPixelY,currentPixelZ,1));
+			//Follow the ray and then give image some values
+			Triangle currentTriangle = scene.getIntersectedTriangle(ray);
+			float pixelBrightness = currentTriangle.getBrightness();
+			glm::vec3 pixelColor = currentTriangle.getColor()*pixelBrightness;
 
-			//Follow the ray
-			//and then give image some values
-			float pixelBrightness = scene.getIntersectedTriangle(ray).getBrightness();
-			glm::vec3 pixelColor = scene.getIntersectedTriangle(ray).getColor()*pixelBrightness;
+			if (glm::max(glm::max(pixelColor.x, pixelColor.y), pixelColor.z) > maxVal)
+				maxVal = glm::max(glm::max(pixelColor.x, pixelColor.y), pixelColor.z);
 
-			
-			//std::cout << "Red: " << scene.getIntersectedTriangle(ray).getColor().x << std::endl;
-
-			image[i][j].setColor(pixelColor.x*pixelBrightness*25, pixelColor.y*pixelBrightness*25, pixelColor.z*pixelBrightness*25);
-			//std::cout << "Red: " << image[i][j].getColor().x << std::endl;
+			image[i][j].setColor(pixelColor.x, pixelColor.y, pixelColor.z);
+		}
+	}
+	
+	glm::vec3 currentColor;
+	for (int i = 0; i < SIZE; i++) {
+		for (int j = 0; j < SIZE; j++) {
+			currentColor = image[i][j].getColor();
+			image[i][j].setColor(currentColor*(255.99f / maxVal));
 		}
 	}
 }
