@@ -14,7 +14,6 @@ int main()
 	
 	scene.createScene();
 		
-	camera.setEye(0);
 	camera.render(scene);
 	camera.createImage();
 }

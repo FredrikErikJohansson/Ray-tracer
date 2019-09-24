@@ -13,7 +13,7 @@ public:
 	~Scene();
 
 	//something like this
-	Triangle& getIntersectedTriangle(Ray ray);
+	Triangle getIntersectedTriangle(Ray ray);
 
 	void createScene();
 

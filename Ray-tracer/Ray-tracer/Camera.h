@@ -8,7 +8,7 @@
 #include "Pixel.h"
 #include "Scene.h"
 
-const int SIZE = 20;
+const int SIZE = 800;
 
 class Camera
 {
@@ -24,7 +24,7 @@ public:
 
 private:
 	glm::vec4 eye00 = glm::vec4(-2,0,0,1);
-	glm::vec4 eye01 = glm::vec4(-1,0,0,1);
+	glm::vec4 eye01 = glm::vec4( -1,0,0,1);
 	int eyeSwitch;
 
 	Pixel image[SIZE][SIZE];

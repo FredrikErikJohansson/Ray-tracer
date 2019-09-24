@@ -15,12 +15,12 @@ void Scene::createScene() {
 	triangles[5].setVertices(glm::vec4(0, 6, -5, 1), glm::vec4(5, 0, -5, 1), glm::vec4(-3, 0, -5, 1));
 
 	//Floor colors
-	triangles[0].setColor(glm::vec3(1, 1, 1));
-	triangles[1].setColor(glm::vec3(1, 1, 1));
-	triangles[2].setColor(glm::vec3(1, 1, 1));
-	triangles[3].setColor(glm::vec3(1, 1, 1));
-	triangles[4].setColor(glm::vec3(1, 1, 1));
-	triangles[5].setColor(glm::vec3(1, 1, 1));
+	triangles[0].setColor(glm::vec3(1, 1, 0));
+	triangles[1].setColor(glm::vec3(1, 1, 0));
+	triangles[2].setColor(glm::vec3(1, 1, 0));
+	triangles[3].setColor(glm::vec3(1, 1, 0));
+	triangles[4].setColor(glm::vec3(1, 1, 0));
+	triangles[5].setColor(glm::vec3(1, 1, 0));
 
 	//Floor normals
 	triangles[0].setNormal(glm::vec3(0, 0, 1));
@@ -57,18 +57,18 @@ void Scene::createScene() {
 	//Walls vertices (right)
 	triangles[12].setVertices(glm::vec4(13, 0, -5, 1), glm::vec4(13, 0, 5, 1), glm::vec4(10, -6, -5, 1));
 	triangles[13].setVertices(glm::vec4(10, -6, -5, 1), glm::vec4(13, 0, 5, 1), glm::vec4(10, -6, 5, 1));
-	triangles[14].setVertices(glm::vec4(10, -6, -5, 1), glm::vec4(10, -6, 5, 1), glm::vec4(0, -6, -5, 1));
-	triangles[15].setVertices(glm::vec4(0, -6, -5, 1), glm::vec4(10, -6, 5, 1), glm::vec4(0, -6, 5, 1));
+	triangles[14].setVertices(glm::vec4(0, -6, -5, 1), glm::vec4(0, -6, 5, 1), glm::vec4(10, -6, -5, 1));
+	triangles[15].setVertices(glm::vec4(10, -6, -5, 1), glm::vec4(0, -6, 5, 1), glm::vec4(10, -6, 5, 1));
 	triangles[16].setVertices(glm::vec4(0, -6, -5, 1), glm::vec4(0, -6, 5, 1), glm::vec4(-3, 0, -5, 1));
 	triangles[17].setVertices(glm::vec4(-3, 0, -5, 1), glm::vec4(0, -6, 5, 1), glm::vec4(-3, 0, 5, 1));
 
 	//Walls colors (right)
-	triangles[6].setColor(glm::vec3(0.5, 0.5, 0));
-	triangles[7].setColor(glm::vec3(0.5, 0.5, 0));
-	triangles[8].setColor(glm::vec3(0, 0.5, 0.5));
-	triangles[9].setColor(glm::vec3(0, 0.5, 0.5));
-	triangles[10].setColor(glm::vec3(0.5, 0, 0.5));
-	triangles[11].setColor(glm::vec3(0.5, 0, 0.5));
+	triangles[12].setColor(glm::vec3(0.5, 0.5, 0));
+	triangles[13].setColor(glm::vec3(0.5, 0.5, 0));
+	triangles[14].setColor(glm::vec3(0, 0, 0.5));
+	triangles[15].setColor(glm::vec3(0, 0, 0.5));
+	triangles[16].setColor(glm::vec3(0.5, 0, 0.5));
+	triangles[17].setColor(glm::vec3(0.5, 0, 0.5));
 
 	//Walls normals (right)
 	triangles[12].setNormal(glm::vec3(-2 / sqrt(5), 1 / sqrt(5), 0));
@@ -108,11 +108,11 @@ Scene::~Scene()
 {
 }
 
-Triangle& Scene::getIntersectedTriangle(Ray ray) {
+Triangle Scene::getIntersectedTriangle(Ray ray) {
 	for (int i = 0; i < 24; i++) {
 		if (triangles[i].rayIntersection(ray)) {
 			return triangles[i];
 		}
 	}
-	return triangles[0];
+	//return triangles[0];
 }

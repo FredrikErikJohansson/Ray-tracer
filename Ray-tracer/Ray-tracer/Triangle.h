@@ -17,6 +17,10 @@ public:
 		return color;
 	}
 
+	float getBrightness() {
+		return brightness;
+	}
+
 	void setVertices(glm::vec4 _v0, glm::vec4 _v1, glm::vec4 _v2) {
 		v0 = _v0;
 		v1 = _v1;
@@ -31,10 +35,10 @@ public:
 		color = _color;
 	}
 
-
 private:
 	glm::vec4 v0, v1, v2;
 	glm::vec3 color;
 	glm::vec3 normal;
+	float brightness;
 };
 

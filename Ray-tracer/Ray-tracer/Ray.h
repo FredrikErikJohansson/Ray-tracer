@@ -9,7 +9,7 @@ public:
 	Ray(glm::vec4 _startPoint, glm::vec4 _endPoint) {
 		startPoint = _startPoint;
 		endPoint = _endPoint;
-		direction = glm::normalize(_endPoint - _startPoint);
+		direction = _endPoint - _startPoint;
 	}
 	~Ray();
 
