@@ -10,7 +10,7 @@ class Tetrahedron
 {
 public:
 	Tetrahedron();
-	Tetrahedron(float _a, float _b, float _c, float _sideLength);
+	Tetrahedron(glm::vec4 _x0, float _sideLength);
 	~Tetrahedron();
 
 	void setTetrahedronVertecies();
@@ -21,9 +21,7 @@ public:
 
 private: 
 	Triangle tetrahedronTriangles[4];
-	float a, b, c;
 	float sideLength;
-
 
 	glm::vec4 v0, v1, v2, v3; //Vertecies
 	glm::vec3 nA, nB, nC, nD; //triangle normals 

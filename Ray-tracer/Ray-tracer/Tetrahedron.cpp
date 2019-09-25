@@ -1,7 +1,5 @@
 #include "Tetrahedron.h"
 
-
-
 void Tetrahedron::createTetrahedron() {
 	
 	//Set the vertecies in the tetrahedron.
@@ -37,18 +35,14 @@ Triangle Tetrahedron::getTetrahedronTriangles(int ind) {
 //Default constructor
 Tetrahedron::Tetrahedron()
 {
-	a = 5.0f;
-	b = -4.0f;
-	c = -2.0f;
+	v0 = glm::vec4(5.0f, -4.0f, -2.0f, 1.0f);
 	sideLength = 2.0f;
 }
 
 //Copy constructor
-Tetrahedron::Tetrahedron(float _a, float _b, float _c, float _sideLength)
+Tetrahedron::Tetrahedron(glm::vec4 _v0, float _sideLength)
 {
-	a = _a;
-	b = _b;
-	c = _c;
+	v0 = _v0;
 	sideLength = _sideLength;
 }
 
@@ -58,10 +52,9 @@ Tetrahedron::~Tetrahedron()
 
 //Set the vertecies in the tetrahedron.
 void Tetrahedron::setTetrahedronVertecies() {
-	v0 = glm::vec4(a, b, c, 1);
-	v1 = glm::vec4(a + (3.0f*pow(sideLength,2.0f))/4.0f , b + sideLength/2.0f ,c , 1);
-	v2 = glm::vec4(a, b + sideLength, c, 1);
-	v3 = glm::vec4(a + (3.0f*pow(sideLength, 2.0f))/8.0f, b + sideLength/2.0f, c + (3.0f * pow(sideLength, 2.0f)) / 4.0f, 1);
+	v1 = glm::vec4(v0.x + (3.0f*pow(sideLength,2.0f))/4.0f , v0.y + sideLength/2.0f ,v0.z , 1);
+	v2 = glm::vec4(v0.x, v0.y + sideLength, v0.z, 1);
+	v3 = glm::vec4(v0.x + (3.0f*pow(sideLength, 2.0f))/8.0f, v0.y + sideLength/2.0f, v0.z + (3.0f * pow(sideLength, 2.0f)) / 4.0f, 1);
 }
 
 //Calculate the normal vectors of the triangles of the tetrahedron.

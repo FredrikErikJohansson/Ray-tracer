@@ -25,9 +25,6 @@ public:
 	Scene();
 	~Scene();
 
-	//something like this
-	//Triangle& getIntersections(Ray ray);
-
 	std::list<TriangleIntersection> triangleIntersections(Ray ray) const;
 	std::list<SphereIntersection> sphereIntersections(Ray ray) const;
 
@@ -45,6 +42,5 @@ private:
 	Triangle triangles[28];
 
 	Sphere spheres[1];
-
 };
 

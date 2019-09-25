@@ -136,8 +136,8 @@ std::list<TriangleIntersection> Scene::triangleIntersections(Ray ray) const {
 		}
 	}
 
+	//Sort intersections after first hit
 	glm::vec3 rayStart = ray.getStartPoint();
-	//Sort intersections in increasing length
 	intersections.sort([&rayStart](const auto &a, const auto &b) {
 		return glm::length(a.point - rayStart) < glm::length(b.point - rayStart);
 	});
