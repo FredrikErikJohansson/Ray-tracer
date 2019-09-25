@@ -11,7 +11,6 @@ Camera::~Camera()
 {
 }
 
-
 void Camera::createImage() {
 
 	FILE *fp = fopen("rendering.ppm", "wb"); /* b - binary mode */
@@ -31,28 +30,77 @@ void Camera::createImage() {
 }
 
 void Camera::render(Scene scene) {
+	float maxVal = 0;
+	Ray ray;
+	glm::vec3 currentPixel;
+
 	for (int i = 0; i < SIZE; i++) {
-		std::cout << i << "/" << SIZE << std::endl;
+		if ( i % 79 == 0 ) std::cout << i + 1 << "/" << SIZE << std::endl;
 		for (int j = 0; j < SIZE; j++) {
 
-			Ray ray;
-			glm::vec3 currentPixel = (glm::vec3(eye01) + glm::vec3(0, i*0.0025 - 0.99875, j*0.0025 - 0.99875) - glm::vec3(eye01));
-			ray = Ray(eye01, glm::vec4(currentPixel, 1));
+			//Camera position
+			if(eyeSwitch){
+				currentPixel = glm::vec3(eye01) + glm::vec3(0, i*0.0025f - 0.99875f, j*0.0025f - 0.99875f) - glm::vec3(eye01);
+				ray = Ray(eye01, glm::vec4(currentPixel, 1));
+			}
+			else {
+				currentPixel = glm::vec3(eye00) + glm::vec3(0, i*0.0025f - 0.99875f, j*0.0025f - 0.99875f) - glm::vec3(eye00);
+				ray = Ray(eye00, glm::vec4(currentPixel, 1));
+			}
 
-			//if(eyeSwitch == 0)
-				//ray = Ray(eye00, glm::vec4(0,currentPixelY,currentPixelZ,1));
-			//else ray = Ray(eye01, glm::vec4(0,currentPixelY,currentPixelZ,1));
+			//Follow the ray and store intersections
+			std::list<TriangleIntersection> triangleIntersections = scene.triangleIntersections(ray);
+			std::list<SphereIntersection> sphereIntersections = scene.sphereIntersections(ray);
 
-			//Follow the ray
-			//and then give image some values
-			float pixelBrightness = scene.getIntersectedTriangle(ray).getBrightness();
-			glm::vec3 pixelColor = scene.getIntersectedTriangle(ray).getColor()*pixelBrightness;
+			Triangle currentTriangle;
+			glm::vec3 currentTriPoint;
+			Sphere currentSphere;
+			glm::vec3 currentSphPoint;
+			float triDistance = 0.0f;
+			float sphDistance = 1000.0f;
+			float pixelBrightness;
+			glm::vec3 pixelColor = glm::vec3(0,1,0);
 
-			
-			//std::cout << "Red: " << scene.getIntersectedTriangle(ray).getColor().x << std::endl;
+			//Check if we have triangle intersection(s)
+			if (!triangleIntersections.empty()) {
+				currentTriangle = triangleIntersections.front().triangle;
+				currentTriPoint = triangleIntersections.front().point;
 
-			image[i][j].setColor(pixelColor.x*pixelBrightness*25, pixelColor.y*pixelBrightness*25, pixelColor.z*pixelBrightness*25);
-			//std::cout << "Red: " << image[i][j].getColor().x << std::endl;
+				triDistance = glm::length(glm::vec3(ray.getStartPoint()) - currentTriPoint);
+			}
+
+			//Check if we have sphere intersection(s)
+			if (!sphereIntersections.empty()) {
+				currentSphere = sphereIntersections.front().sphere;
+				currentSphPoint = sphereIntersections.front().point;
+
+				sphDistance = glm::length(glm::vec3(ray.getStartPoint()) - currentSphPoint);
+			}		
+
+			//Check which intersection is closest to camera
+			if (triDistance > sphDistance) {
+				pixelBrightness = currentSphere.getBrightness();
+				pixelColor = currentSphere.getColor()*pixelBrightness;
+			}
+			else {
+				pixelBrightness = currentTriangle.getBrightness();
+				pixelColor = currentTriangle.getColor()*pixelBrightness;
+			}
+
+			//Store the highest color value
+			if (glm::max(glm::max(pixelColor.x, pixelColor.y), pixelColor.z) > maxVal)
+				maxVal = glm::max(glm::max(pixelColor.x, pixelColor.y), pixelColor.z);
+
+			image[i][j].setColor(pixelColor.x, pixelColor.y, pixelColor.z);
+		}
+	}
+	
+	//Map the color values from the max values
+	glm::vec3 currentColor;
+	for (int i = 0; i < SIZE; i++) {
+		for (int j = 0; j < SIZE; j++) {
+			currentColor = image[i][j].getColor();
+			image[i][j].setColor(currentColor*(255.99f / maxVal));
 		}
 	}
 }

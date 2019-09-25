@@ -16,6 +16,10 @@ public:
 		color = glm::vec3(_red, _green, _blue);
 	}
 
+	void setColor(glm::vec3 _color) {
+		color = _color;
+	}
+
 private:
 	glm::vec3 color;
 	Ray ray;

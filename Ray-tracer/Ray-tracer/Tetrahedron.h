@@ -2,7 +2,7 @@
 
 #include <cmath>
 #include <iostream>
-
+#include <math.h>
 #include "Triangle.h"
 #include "Ray.h"
 
@@ -10,7 +10,7 @@ class Tetrahedron
 {
 public:
 	Tetrahedron();
-	Tetrahedron(int _a, int _b, int _c, float _sideLength);
+	Tetrahedron(float _a, float _b, float _c, float _sideLength);
 	~Tetrahedron();
 
 	void setVertecies();
@@ -21,7 +21,7 @@ public:
 
 private: 
 	Triangle tetrahedronTriangles[4];
-	int a, b, c;
+	float a, b, c;
 	float sideLength;
 
 

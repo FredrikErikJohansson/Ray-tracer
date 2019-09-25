@@ -7,7 +7,7 @@ Scene::Scene()
 }
 
 void Scene::createScene() {
-	/*
+	
 	//Floor vertices
 	triangles[0].setVertices(glm::vec4(-3, 0, -5, 1), glm::vec4(5, 0, -5, 1), glm::vec4(0, -6, -5, 1));
 	triangles[1].setVertices(glm::vec4(0, -6, -5, 1), glm::vec4(5, 0, -5, 1), glm::vec4(10, -6, -5, 1));
@@ -17,12 +17,12 @@ void Scene::createScene() {
 	triangles[5].setVertices(glm::vec4(0, 6, -5, 1), glm::vec4(5, 0, -5, 1), glm::vec4(-3, 0, -5, 1));
 
 	//Floor colors
-	triangles[0].setColor(glm::vec3(1, 1, 0));
-	triangles[1].setColor(glm::vec3(1, 1, 0));
-	triangles[2].setColor(glm::vec3(1, 1, 0));
-	triangles[3].setColor(glm::vec3(1, 1, 0));
-	triangles[4].setColor(glm::vec3(1, 1, 0));
-	triangles[5].setColor(glm::vec3(1, 1, 0));
+	triangles[0].setColor(glm::vec3(1, 1, 1));
+	triangles[1].setColor(glm::vec3(1, 1, 1));
+	triangles[2].setColor(glm::vec3(1, 1, 1));
+	triangles[3].setColor(glm::vec3(1, 1, 1));
+	triangles[4].setColor(glm::vec3(1, 1, 1));
+	triangles[5].setColor(glm::vec3(1, 1, 1));
 
 	//Floor normals
 	triangles[0].setNormal(glm::vec3(0, 0, 1));
@@ -103,11 +103,21 @@ void Scene::createScene() {
 	triangles[21].setNormal(glm::vec3(0, 0, -1));
 	triangles[22].setNormal(glm::vec3(0, 0, -1));
 	triangles[23].setNormal(glm::vec3(0, 0, -1));
-	*/
+
+	
 
 	for (int i = 0; i < tetrahedronTriangleAmount; i++) {
 		triangles[sceneTriangles + i] = tetrahedron.getTetrahedronTriangles(i);
 	}
+
+	std::cout << triangles[26].getColor().x << "\n";
+
+
+	//Sphere
+	spheres[0].setCenter(glm::vec3(10, 2, 0));
+	spheres[0].setRadius(2.0f);
+	spheres[0].setColor(glm::vec3(1, 0, 0));
+
 }
 
 
@@ -115,11 +125,37 @@ Scene::~Scene()
 {
 }
 
-Triangle Scene::getIntersectedTriangle(Ray ray) {
-	for (int i = sceneTriangles; i < triangleAmount; i++) {
-		if (triangles[i].rayIntersection(ray)) {
-			return triangles[i];
+
+std::list<TriangleIntersection> Scene::triangleIntersections(Ray ray) const {
+	std::list<TriangleIntersection> intersections = {};
+	for (Triangle triangle : triangles) {
+		TriangleIntersection ti;
+		glm::vec3 intersection;
+		if (triangle.rayIntersection(ray, intersection)) {
+			ti.triangle = triangle;
+			ti.point = intersection;
+			intersections.push_back(ti);
 		}
 	}
-	//return triangles[0];
-}
+
+	glm::vec3 rayStart = ray.getStartPoint();
+	//Sort intersections in increasing length
+	intersections.sort([&rayStart](const auto &a, const auto &b) {
+		return glm::length(a.point - rayStart) < glm::length(b.point - rayStart);
+	});
+	return intersections;
+};
+
+std::list<SphereIntersection> Scene::sphereIntersections(Ray ray) const {
+	std::list<SphereIntersection> intersectinons = {};
+	for (Sphere sphere : spheres) {
+		glm::vec3 intersection;
+		SphereIntersection si;
+		if(sphere.rayIntersection(ray, intersection)) {
+			si.sphere = sphere;
+			si.point = intersection;
+			intersectinons.push_back(si);
+		}
+	}
+	return intersectinons;
+};
