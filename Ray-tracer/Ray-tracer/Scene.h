@@ -5,6 +5,7 @@
 
 #include "Triangle.h"
 #include "Ray.h"
+#include "Tetrahedron.h"
 
 class Scene
 {
@@ -18,6 +19,13 @@ public:
 	void createScene();
 
 private:
-	Triangle triangles[24];
+	//The room is 24 triangles
+	//Tetrahedron is 4 triangles
+	int triangleAmount = 28;
+	int tetrahedronTriangleAmount = 4;
+	int sceneTriangles = 24;
+
+	Tetrahedron tetrahedron;
+	Triangle triangles[28];
 };
 

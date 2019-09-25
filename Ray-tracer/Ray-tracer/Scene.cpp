@@ -3,9 +3,11 @@
 
 Scene::Scene()
 {
+	tetrahedron.createTetrahedron();
 }
 
 void Scene::createScene() {
+	/*
 	//Floor vertices
 	triangles[0].setVertices(glm::vec4(-3, 0, -5, 1), glm::vec4(5, 0, -5, 1), glm::vec4(0, -6, -5, 1));
 	triangles[1].setVertices(glm::vec4(0, -6, -5, 1), glm::vec4(5, 0, -5, 1), glm::vec4(10, -6, -5, 1));
@@ -101,6 +103,11 @@ void Scene::createScene() {
 	triangles[21].setNormal(glm::vec3(0, 0, -1));
 	triangles[22].setNormal(glm::vec3(0, 0, -1));
 	triangles[23].setNormal(glm::vec3(0, 0, -1));
+	*/
+
+	for (int i = 0; i < tetrahedronTriangleAmount; i++) {
+		triangles[sceneTriangles + i] = tetrahedron.getTetrahedronTriangles(i);
+	}
 }
 
 
@@ -109,7 +116,7 @@ Scene::~Scene()
 }
 
 Triangle Scene::getIntersectedTriangle(Ray ray) {
-	for (int i = 0; i < 24; i++) {
+	for (int i = sceneTriangles; i < triangleAmount; i++) {
 		if (triangles[i].rayIntersection(ray)) {
 			return triangles[i];
 		}
