@@ -13,7 +13,7 @@ public:
 	Tetrahedron(float _a, float _b, float _c, float _sideLength);
 	~Tetrahedron();
 
-	void setVertecies();
+	void setTetrahedronVertecies();
 	void calcNormals();
 
 	void createTetrahedron();
@@ -25,7 +25,7 @@ private:
 	float sideLength;
 
 
-	glm::vec4 v0, v1, v2, v3;
+	glm::vec4 v0, v1, v2, v3; //Vertecies
 	glm::vec3 nA, nB, nC, nD; //triangle normals 
 };
 

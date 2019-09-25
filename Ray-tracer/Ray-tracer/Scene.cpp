@@ -3,6 +3,7 @@
 
 Scene::Scene()
 {
+	//Create the tetrahedron
 	tetrahedron.createTetrahedron();
 }
 
@@ -105,12 +106,10 @@ void Scene::createScene() {
 	triangles[23].setNormal(glm::vec3(0, 0, -1));
 	
 
+	//Get the triangles of the tetrahedron
 	for (int i = 0; i < tetrahedronTriangleAmount; i++) {
 		triangles[sceneTriangles + i] = tetrahedron.getTetrahedronTriangles(i);
 	}
-
-	std::cout << triangles[26].getColor().x << "\n";
-
 
 	//Sphere
 	spheres[0].setCenter(glm::vec3(10, 2, 0));
