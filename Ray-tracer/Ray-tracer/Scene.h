@@ -19,6 +19,16 @@ struct SphereIntersection {
 	glm::vec3 point;
 };
 
+struct TriangleIntersection {
+	Triangle triangle;
+	glm::vec3 point;
+};
+
+struct SphereIntersection {
+	Sphere sphere;
+	glm::vec3 point;
+};
+
 class Scene
 {
 public:

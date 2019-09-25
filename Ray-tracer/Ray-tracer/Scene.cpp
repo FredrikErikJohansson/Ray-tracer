@@ -103,7 +103,6 @@ void Scene::createScene() {
 	triangles[21].setNormal(glm::vec3(0, 0, -1));
 	triangles[22].setNormal(glm::vec3(0, 0, -1));
 	triangles[23].setNormal(glm::vec3(0, 0, -1));
-
 	
 
 	for (int i = 0; i < tetrahedronTriangleAmount; i++) {
