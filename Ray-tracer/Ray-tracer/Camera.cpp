@@ -37,6 +37,8 @@ void Camera::render(Scene scene) {
 	for (int i = 0; i < SIZE; i++) {
 		if ( i % 79 == 0 ) std::cout << i + 1 << "/" << SIZE << std::endl;
 		for (int j = 0; j < SIZE; j++) {
+
+			//Camera position
 			if(eyeSwitch){
 				currentPixel = glm::vec3(eye01) + glm::vec3(0, i*0.0025f - 0.99875f, j*0.0025f - 0.99875f) - glm::vec3(eye01);
 				ray = Ray(eye01, glm::vec4(currentPixel, 1));
@@ -47,11 +49,9 @@ void Camera::render(Scene scene) {
 			}
 
 			//Follow the ray and store intersections
-			//TODO: add sphereIntersections
 			std::list<TriangleIntersection> triangleIntersections = scene.triangleIntersections(ray);
 			std::list<SphereIntersection> sphereIntersections = scene.sphereIntersections(ray);
 
-			
 			Triangle currentTriangle;
 			glm::vec3 currentTriPoint;
 			Sphere currentSphere;
@@ -61,6 +61,7 @@ void Camera::render(Scene scene) {
 			float pixelBrightness;
 			glm::vec3 pixelColor = glm::vec3(0,1,0);
 
+			//Check if we have triangle intersection(s)
 			if (!triangleIntersections.empty()) {
 				currentTriangle = triangleIntersections.front().triangle;
 				currentTriPoint = triangleIntersections.front().point;
@@ -68,6 +69,7 @@ void Camera::render(Scene scene) {
 				triDistance = glm::length(glm::vec3(ray.getStartPoint()) - currentTriPoint);
 			}
 
+			//Check if we have sphere intersection(s)
 			if (!sphereIntersections.empty()) {
 				currentSphere = sphereIntersections.front().sphere;
 				currentSphPoint = sphereIntersections.front().point;
@@ -75,6 +77,7 @@ void Camera::render(Scene scene) {
 				sphDistance = glm::length(glm::vec3(ray.getStartPoint()) - currentSphPoint);
 			}		
 
+			//Check which intersection is closest to camera
 			if (triDistance > sphDistance) {
 				pixelBrightness = currentSphere.getBrightness();
 				pixelColor = currentSphere.getColor()*pixelBrightness;
@@ -84,6 +87,7 @@ void Camera::render(Scene scene) {
 				pixelColor = currentTriangle.getColor()*pixelBrightness;
 			}
 
+			//Store the highest color value
 			if (glm::max(glm::max(pixelColor.x, pixelColor.y), pixelColor.z) > maxVal)
 				maxVal = glm::max(glm::max(pixelColor.x, pixelColor.y), pixelColor.z);
 
@@ -91,6 +95,7 @@ void Camera::render(Scene scene) {
 		}
 	}
 	
+	//Map the color values from the max values
 	glm::vec3 currentColor;
 	for (int i = 0; i < SIZE; i++) {
 		for (int j = 0; j < SIZE; j++) {

@@ -39,8 +39,6 @@ bool Triangle::rayIntersection(Ray ray, glm::vec3 &intersection) {
 	//Make visibility test (if not visible set brightness to 0)
 	//traceShadowRay() which calls rayIntersection
 	Ray shadowRay = Ray(currentHit, glm::vec3(5, 0, 4));
-	glm::vec3 shadowHit;
-
 	float shadowAngle = glm::dot(shadowRay.getDirection(), this->normal) / (glm::length(shadowRay.getDirection())*glm::length(this->normal));
 	this->brightness = shadowAngle;
 
