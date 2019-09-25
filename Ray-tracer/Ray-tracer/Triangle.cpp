@@ -10,7 +10,7 @@ Triangle::~Triangle()
 {
 }
 
-bool Triangle::rayIntersection(Ray ray) {
+bool Triangle::rayIntersection(Ray ray, glm::vec3 &intersection) {
 	
 	glm::vec3 rayStart = ray.getStartPoint();
 	glm::vec3 rayEnd = ray.getEndPoint();
@@ -23,8 +23,6 @@ bool Triangle::rayIntersection(Ray ray) {
 
 	glm::vec3 P = glm::cross(direction, edge02);
 	glm::vec3 Q = glm::cross(rayToVertex, edge01);
-
-	t = glm::dot(Q, edge02) / glm::dot(P, edge01);
 	u = glm::dot(P, rayToVertex) / glm::dot(P, edge01);
 	v = glm::dot(Q, direction) / glm::dot(P, edge01);
 
@@ -33,11 +31,24 @@ bool Triangle::rayIntersection(Ray ray) {
 	if (u + v > 1) return false;
 
 	glm::vec3 currentHit = (1 - u - v)*v0 + u * v1 + v * v2;
-	glm::vec3 shadowRay = glm::vec3(5, 0, 4) - currentHit;
-	float angle = glm::dot(shadowRay, this->normal) / (glm::length(shadowRay)*glm::length(this->normal));
-	this->brightness = angle;
+	float hitAngle = acos(glm::dot(currentHit, this->normal) / (glm::length(currentHit)*glm::length(this->normal)));
 
-	if (t > DBL_EPSILON && t < DBL_MAX) return true;
+	//Check if triangle is infront of ray
+	if (hitAngle > 45.0f) return false;
 
-	return false;
+	//Make visibility test (if not visible set brightness to 0)
+	//traceShadowRay() which calls rayIntersection
+	Ray shadowRay = Ray(currentHit, glm::vec3(5, 0, 4));
+	glm::vec3 shadowHit;
+
+	float shadowAngle = glm::dot(shadowRay.getDirection(), this->normal) / (glm::length(shadowRay.getDirection())*glm::length(this->normal));
+	this->brightness = shadowAngle;
+
+	t = glm::dot(Q, edge02) / glm::dot(P, edge01);
+
+	if (t < FLT_EPSILON || t > 1000.0f) return false;
+
+	intersection = rayStart + direction * t;
+
+	return true;
 }

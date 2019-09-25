@@ -101,6 +101,11 @@ void Scene::createScene() {
 	triangles[21].setNormal(glm::vec3(0, 0, -1));
 	triangles[22].setNormal(glm::vec3(0, 0, -1));
 	triangles[23].setNormal(glm::vec3(0, 0, -1));
+
+	//Sphere
+	spheres[0].setCenter(glm::vec3(10, 2, 0));
+	spheres[0].setRadius(2.0f);
+	spheres[0].setColor(glm::vec3(1, 0, 0));
 }
 
 
@@ -108,14 +113,36 @@ Scene::~Scene()
 {
 }
 
-Triangle Scene::getIntersectedTriangle(Ray ray) {
-	for (int i = 0; i < 24; i++) {
-		//Check if ray is infront of the triangle
-		//This does not work properly
-		//if (acos(glm::dot(ray.getDirection(), triangles[i].getNormal())) < 90.0f) {
-			if (triangles[i].rayIntersection(ray)) {
-				return triangles[i];
-			}
-		//}
+std::list<TriangleIntersection> Scene::triangleIntersections(Ray ray) const {
+	std::list<TriangleIntersection> intersections = {};
+	for (Triangle triangle : triangles) {
+		TriangleIntersection ti;
+		glm::vec3 intersection;
+		if (triangle.rayIntersection(ray, intersection)) {
+			ti.triangle = triangle;
+			ti.point = intersection;
+			intersections.push_back(ti);
+		}
 	}
-}
+
+	glm::vec3 rayStart = ray.getStartPoint();
+	//Sort intersections in increasing length
+	intersections.sort([&rayStart](const auto &a, const auto &b) {
+		return glm::length(a.point - rayStart) < glm::length(b.point - rayStart);
+	});
+	return intersections;
+};
+
+std::list<SphereIntersection> Scene::sphereIntersections(Ray ray) const {
+	std::list<SphereIntersection> intersectinons = {};
+	for (Sphere sphere : spheres) {
+		glm::vec3 intersection;
+		SphereIntersection si;
+		if(sphere.rayIntersection(ray, intersection)) {
+			si.sphere = sphere;
+			si.point = intersection;
+			intersectinons.push_back(si);
+		}
+	}
+	return intersectinons;
+};

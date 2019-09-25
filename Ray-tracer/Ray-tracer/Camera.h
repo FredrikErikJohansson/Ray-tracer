@@ -17,6 +17,7 @@ public:
 	~Camera();
 
 	void render(Scene scene);
+	//glm::vec3 castRays();
 
 	void createImage();
 

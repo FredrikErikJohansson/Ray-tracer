@@ -31,18 +31,58 @@ void Camera::createImage() {
 
 void Camera::render(Scene scene) {
 	float maxVal = 0;
+	Ray ray;
+	glm::vec3 currentPixel;
 
 	for (int i = 0; i < SIZE; i++) {
 		if ( i % 79 == 0 ) std::cout << i + 1 << "/" << SIZE << std::endl;
 		for (int j = 0; j < SIZE; j++) {
-			Ray ray;
-			glm::vec3 currentPixel = (glm::vec3(eye01) + glm::vec3(0, i*0.0025f - 0.99875f, j*0.0025f - 0.99875f) - glm::vec3(eye01));
-			ray = Ray(eye01, glm::vec4(currentPixel, 1));
+			if(eyeSwitch){
+				currentPixel = glm::vec3(eye01) + glm::vec3(0, i*0.0025f - 0.99875f, j*0.0025f - 0.99875f) - glm::vec3(eye01);
+				ray = Ray(eye01, glm::vec4(currentPixel, 1));
+			}
+			else {
+				currentPixel = glm::vec3(eye00) + glm::vec3(0, i*0.0025f - 0.99875f, j*0.0025f - 0.99875f) - glm::vec3(eye00);
+				ray = Ray(eye00, glm::vec4(currentPixel, 1));
+			}
 
-			//Follow the ray and then give image some values
-			Triangle currentTriangle = scene.getIntersectedTriangle(ray);
-			float pixelBrightness = currentTriangle.getBrightness();
-			glm::vec3 pixelColor = currentTriangle.getColor()*pixelBrightness;
+			//Follow the ray and store intersections
+			//TODO: add sphereIntersections
+			std::list<TriangleIntersection> triangleIntersections = scene.triangleIntersections(ray);
+			std::list<SphereIntersection> sphereIntersections = scene.sphereIntersections(ray);
+
+			
+			Triangle currentTriangle;
+			glm::vec3 currentTriPoint;
+			Sphere currentSphere;
+			glm::vec3 currentSphPoint;
+			float triDistance = 0.0f;
+			float sphDistance = 1000.0f;
+			float pixelBrightness;
+			glm::vec3 pixelColor = glm::vec3(0,1,0);
+
+			if (!triangleIntersections.empty()) {
+				currentTriangle = triangleIntersections.front().triangle;
+				currentTriPoint = triangleIntersections.front().point;
+
+				triDistance = glm::length(glm::vec3(ray.getStartPoint()) - currentTriPoint);
+			}
+
+			if (!sphereIntersections.empty()) {
+				currentSphere = sphereIntersections.front().sphere;
+				currentSphPoint = sphereIntersections.front().point;
+
+				sphDistance = glm::length(glm::vec3(ray.getStartPoint()) - currentSphPoint);
+			}		
+
+			if (triDistance > sphDistance) {
+				pixelBrightness = currentSphere.getBrightness();
+				pixelColor = currentSphere.getColor()*pixelBrightness;
+			}
+			else {
+				pixelBrightness = currentTriangle.getBrightness();
+				pixelColor = currentTriangle.getColor()*pixelBrightness;
+			}
 
 			if (glm::max(glm::max(pixelColor.x, pixelColor.y), pixelColor.z) > maxVal)
 				maxVal = glm::max(glm::max(pixelColor.x, pixelColor.y), pixelColor.z);
