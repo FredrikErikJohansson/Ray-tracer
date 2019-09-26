@@ -53,51 +53,48 @@ void Camera::render(Scene scene) {
 			std::list<SphereIntersection> sphereIntersections = scene.sphereIntersections(ray);
 
 			Triangle currentTriangle;
-			glm::vec3 currentTriPoint;
+			glm::vec3 currentTrianglePoint;
+
 			Sphere currentSphere;
-			glm::vec3 currentSphPoint;
-			float triDistance = 1000.0f;
-			float sphDistance = 1000.0f;
+			glm::vec3 currentSpherePoint;
+
+			float distanceToTriangle = 1000.0f;
+			float distanceToSphere = 1000.0f;
+
 			float pixelBrightness;
 			glm::vec3 pixelColor;
 
 			//Check if we have triangle intersection(s)
 			if (!triangleIntersections.empty()) {
 				currentTriangle = triangleIntersections.front().triangle;
-				currentTriPoint = triangleIntersections.front().point;
-				triDistance = glm::length(glm::vec3(ray.getStartPoint()) - currentTriPoint);
+				currentTrianglePoint = triangleIntersections.front().point;
+				distanceToTriangle = glm::length(glm::vec3(ray.getStartPoint()) - currentTrianglePoint);
 			}
 
 			//Check if we have sphere intersection(s)
 			if (!sphereIntersections.empty()) {
 				currentSphere = sphereIntersections.front().sphere;
-				currentSphPoint = sphereIntersections.front().point;
-				sphDistance = glm::length(glm::vec3(ray.getStartPoint()) - currentSphPoint);		
+				currentSpherePoint = sphereIntersections.front().point;
+				distanceToSphere = glm::length(glm::vec3(ray.getStartPoint()) - currentSpherePoint);
 			}
 
 			//Check which intersection is closest to camera
-			if (triDistance > sphDistance) {
+			if (distanceToTriangle > distanceToSphere) {
 
 				//Visibility test for sphere
-				Ray shadowRay = Ray(currentTriPoint, glm::vec3(5, 0, 4));
-				triangleIntersections = scene.triangleIntersections(shadowRay);
-				sphereIntersections = scene.sphereIntersections(shadowRay);
-				if (triangleIntersections.size() < 2 && sphereIntersections.size() < 2)
-					pixelBrightness = currentSphere.getBrightness();
+				Ray shadowRay = Ray(currentTrianglePoint, glm::vec3(5, 0, 4));
+				if(scene.visibilityTest(shadowRay,"sphere")) pixelBrightness = currentSphere.getBrightness();
 				else pixelBrightness = 0;
 
 				pixelColor = currentSphere.getColor()*pixelBrightness;
 			}
-			else if(triDistance < sphDistance) {
+			else if(distanceToTriangle < distanceToSphere) {
 
 				//Visibility test for triangle
-				Ray shadowRay = Ray(currentTriPoint, glm::vec3(5, 0, 4));
-				if (currentTriPoint.z >= 4) pixelBrightness = currentTriangle.getBrightness();
+				Ray shadowRay = Ray(currentTrianglePoint, glm::vec3(5, 0, 4));
+				if (currentTrianglePoint.z >= 4) pixelBrightness = currentTriangle.getBrightness();
 				else {
-					triangleIntersections = scene.triangleIntersections(shadowRay);
-					sphereIntersections = scene.sphereIntersections(shadowRay);
-					if (triangleIntersections.size() < 2 && sphereIntersections.size() < 1)
-						pixelBrightness = currentTriangle.getBrightness();
+					if (scene.visibilityTest(shadowRay, "triangle")) pixelBrightness = currentTriangle.getBrightness();
 					else pixelBrightness = 0;
 				}
 

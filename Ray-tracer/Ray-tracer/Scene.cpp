@@ -157,3 +157,16 @@ std::list<SphereIntersection> Scene::sphereIntersections(Ray ray) const {
 	}
 	return intersectinons;
 };
+
+bool Scene::visibilityTest(Ray shadowRay, std::string type) {
+	int num;
+	if (type == "triangle") num = 1;
+	if (type == "sphere") num = 2;
+
+	std::list<TriangleIntersection> triangleIntersections = this->triangleIntersections(shadowRay);
+	std::list<SphereIntersection> sphereIntersections = this->sphereIntersections(shadowRay);
+	if (triangleIntersections.size() < 2 && sphereIntersections.size() < num) return true;
+
+	return false;
+}
+

@@ -28,6 +28,7 @@ public:
 	std::list<TriangleIntersection> triangleIntersections(Ray ray) const;
 	std::list<SphereIntersection> sphereIntersections(Ray ray) const;
 
+	bool visibilityTest(Ray shadowRay, std::string type);
 	void createScene();
 
 private:
