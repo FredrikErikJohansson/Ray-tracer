@@ -21,6 +21,10 @@ public:
 		return color;
 	}
 
+	glm::vec3 getCenter() {
+		return center;
+	}
+
 	void setColor(glm::vec3 _color) {
 		color = _color;
 	}

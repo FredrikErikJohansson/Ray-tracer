@@ -112,7 +112,7 @@ void Scene::createScene() {
 	}
 
 	//Sphere
-	spheres[0].setCenter(glm::vec3(10, 2, 0));
+	spheres[0].setCenter(glm::vec3(8, 2 , 0));
 	spheres[0].setRadius(2.0f);
 	spheres[0].setColor(glm::vec3(1, 0, 0));
 
@@ -131,7 +131,7 @@ std::list<TriangleIntersection> Scene::triangleIntersections(Ray ray) const {
 		glm::vec3 intersection;
 		if (triangle.rayIntersection(ray, intersection)) {
 			ti.triangle = triangle;
-			ti.point = intersection;
+			ti.point = intersection + 0.001f * triangle.getNormal();
 			intersections.push_back(ti);
 		}
 	}
@@ -151,7 +151,7 @@ std::list<SphereIntersection> Scene::sphereIntersections(Ray ray) const {
 		SphereIntersection si;
 		if(sphere.rayIntersection(ray, intersection)) {
 			si.sphere = sphere;
-			si.point = intersection;
+			si.point = intersection + 0.001f * glm::normalize(si.point - sphere.getCenter());
 			intersectinons.push_back(si);
 		}
 	}

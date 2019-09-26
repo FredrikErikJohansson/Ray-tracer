@@ -56,16 +56,15 @@ void Camera::render(Scene scene) {
 			glm::vec3 currentTriPoint;
 			Sphere currentSphere;
 			glm::vec3 currentSphPoint;
-			float triDistance = 0.0f;
+			float triDistance = 1000.0f;
 			float sphDistance = 1000.0f;
 			float pixelBrightness;
-			glm::vec3 pixelColor = glm::vec3(0,1,0);
+			glm::vec3 pixelColor;
 
 			//Check if we have triangle intersection(s)
 			if (!triangleIntersections.empty()) {
 				currentTriangle = triangleIntersections.front().triangle;
 				currentTriPoint = triangleIntersections.front().point;
-
 				triDistance = glm::length(glm::vec3(ray.getStartPoint()) - currentTriPoint);
 			}
 
@@ -73,18 +72,40 @@ void Camera::render(Scene scene) {
 			if (!sphereIntersections.empty()) {
 				currentSphere = sphereIntersections.front().sphere;
 				currentSphPoint = sphereIntersections.front().point;
-
-				sphDistance = glm::length(glm::vec3(ray.getStartPoint()) - currentSphPoint);
-			}		
+				sphDistance = glm::length(glm::vec3(ray.getStartPoint()) - currentSphPoint);		
+			}
 
 			//Check which intersection is closest to camera
 			if (triDistance > sphDistance) {
-				pixelBrightness = currentSphere.getBrightness();
+
+				//Visibility test for sphere
+				Ray shadowRay = Ray(currentTriPoint, glm::vec3(5, 0, 4));
+				triangleIntersections = scene.triangleIntersections(shadowRay);
+				sphereIntersections = scene.sphereIntersections(shadowRay);
+				if (triangleIntersections.size() < 2 && sphereIntersections.size() < 2)
+					pixelBrightness = currentSphere.getBrightness();
+				else pixelBrightness = 0;
+
 				pixelColor = currentSphere.getColor()*pixelBrightness;
 			}
-			else {
-				pixelBrightness = currentTriangle.getBrightness();
+			else if(triDistance < sphDistance) {
+
+				//Visibility test for triangle
+				Ray shadowRay = Ray(currentTriPoint, glm::vec3(5, 0, 4));
+				if (currentTriPoint.z >= 4) pixelBrightness = currentTriangle.getBrightness();
+				else {
+					triangleIntersections = scene.triangleIntersections(shadowRay);
+					sphereIntersections = scene.sphereIntersections(shadowRay);
+					if (triangleIntersections.size() < 2 && sphereIntersections.size() < 1)
+						pixelBrightness = currentTriangle.getBrightness();
+					else pixelBrightness = 0;
+				}
+
 				pixelColor = currentTriangle.getColor()*pixelBrightness;
+			}
+			else {
+				std::cout << "Err: pixel (" << i << ", " << j << ")" << " has no hit." << std::endl;
+				pixelColor = glm::vec3(0, 1, 0);
 			}
 
 			//Store the highest color value

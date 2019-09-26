@@ -21,14 +21,13 @@ bool Sphere::rayIntersection(Ray ray, glm::vec3 &intersection) {
 
 	x = pow((b / 2.0f), 2.0f) - c;
 
-	if (x < 0) return false;
+	if (x < FLT_EPSILON) return false;
 
 	d1 = -(b / 2.0f) + sqrt(x);
 	d2 = -(b / 2.0f) - sqrt(x);
 	
-	if (d1 < 0) d = d2;
-	else if (d2 < 0) d = d1;
-	else if (d1 < d2) d = d1;
+	if (d1 <= 0 && d2 <= 0) return false;
+	else if (d1 < 0) d = d2;
 	else d = d2;
 
 	//Check if d is a number?
