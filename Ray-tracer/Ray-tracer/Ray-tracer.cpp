@@ -11,6 +11,8 @@ int main()
 	Scene scene;
 
 	Camera camera;
+
+	camera.setEye(1);
 	
 	scene.createScene();
 		

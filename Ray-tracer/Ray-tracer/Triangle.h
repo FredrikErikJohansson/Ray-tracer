@@ -40,10 +40,20 @@ public:
 		color = _color;
 	}
 
+	std::string getMaterial() {
+		return material;
+	}
+
+	void setMaterial(std::string _material) {
+		material = _material;
+	}
+
 private:
 	glm::vec4 v0, v1, v2;
 	glm::vec3 color;
 	glm::vec3 normal;
 	float brightness;
+
+	std::string material = "DIFFUSE";
 };
 

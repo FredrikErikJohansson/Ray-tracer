@@ -1,6 +1,7 @@
 #pragma once
 
 #include <math.h>
+#include <string>
 
 #include "glm/glm.hpp"
 #include "Ray.h"
@@ -25,6 +26,11 @@ public:
 		return center;
 	}
 
+	std::string getMaterial() {
+		return material;
+	}
+
+
 	void setColor(glm::vec3 _color) {
 		color = _color;
 	}
@@ -37,10 +43,15 @@ public:
 		radius = _radius;
 	}
 
+	void setMaterial(std::string _material) {
+		material = _material;
+	}
+
 private:
 	glm::vec3 center;
 	glm::vec3 color;
 	float radius;
 	float brightness;
+	std::string material;
 };
 

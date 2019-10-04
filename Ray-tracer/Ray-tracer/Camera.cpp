@@ -3,10 +3,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-Camera::Camera()
-{
-}
-
 Camera::~Camera()
 {
 }
@@ -20,9 +16,9 @@ void Camera::createImage() {
 		for (int i = SIZE-1; i > -1; --i)
 		{
 			static unsigned char color[3];
-			color[0] = image[i][j].getColor().x;  /* red */
-			color[1] = image[i][j].getColor().y;  /* green */
-			color[2] = image[i][j].getColor().z;  /* blue */
+			color[0] = (unsigned char)image[i][j].getColor().x;  /* red */
+			color[1] = (unsigned char)image[i][j].getColor().y;  /* green */
+			color[2] = (unsigned char)image[i][j].getColor().z;  /* blue */
 			fwrite(color, 1, 3, fp);
 		}
 	}
@@ -34,11 +30,11 @@ void Camera::render(Scene scene) {
 	Ray ray;
 	glm::vec3 currentPixel;
 
-	for (int i = 0; i < SIZE; i++) {
+	for (register size_t i = 0; i < SIZE; i++) {
 		if ( i % 79 == 0 ) std::cout << i + 1 << "/" << SIZE << std::endl;
-		for (int j = 0; j < SIZE; j++) {
+		for (register size_t j = 0; j < SIZE; j++) {
 
-			//Camera position
+			//Camera position for 800x800
 			if(eyeSwitch){
 				currentPixel = glm::vec3(eye01) + glm::vec3(0, i*0.0025f - 0.99875f, j*0.0025f - 0.99875f) - glm::vec3(eye01);
 				ray = Ray(eye01, glm::vec4(currentPixel, 1));
@@ -48,61 +44,53 @@ void Camera::render(Scene scene) {
 				ray = Ray(eye00, glm::vec4(currentPixel, 1));
 			}
 
-			//Follow the ray and store intersections
-			std::list<TriangleIntersection> triangleIntersections = scene.triangleIntersections(ray);
-			std::list<SphereIntersection> sphereIntersections = scene.sphereIntersections(ray);
-
-			Triangle currentTriangle;
-			glm::vec3 currentTrianglePoint;
-
-			Sphere currentSphere;
-			glm::vec3 currentSpherePoint;
+			//Follow the ray and store the first intersection
+			TriangleIntersection triangleIntersection = scene.triangleIntersections(ray);
+			SphereIntersection sphereIntersection = scene.sphereIntersections(ray);
 
 			float distanceToTriangle = 1000.0f;
 			float distanceToSphere = 1000.0f;
 
 			float pixelBrightness;
 			glm::vec3 pixelColor;
+			Ray shadowRay;
+
+			//Check if we have atleast one intersection
+			if (triangleIntersection.point.x > 999.0f && sphereIntersection.point.x > 999.0f) {
+				std::cout << "Err: No point hit" << std::endl;
+				pixelColor = glm::vec3(1, 0, 0);
+				continue;
+			}
 
 			//Check if we have triangle intersection(s)
-			if (!triangleIntersections.empty()) {
-				currentTriangle = triangleIntersections.front().triangle;
-				currentTrianglePoint = triangleIntersections.front().point;
-				distanceToTriangle = glm::length(glm::vec3(ray.getStartPoint()) - currentTrianglePoint);
+			if (triangleIntersection.point.x < 999.0f) {
+				distanceToTriangle = glm::length(glm::vec3(ray.getStartPoint()) - triangleIntersection.point);
 			}
 
 			//Check if we have sphere intersection(s)
-			if (!sphereIntersections.empty()) {
-				currentSphere = sphereIntersections.front().sphere;
-				currentSpherePoint = sphereIntersections.front().point;
-				distanceToSphere = glm::length(glm::vec3(ray.getStartPoint()) - currentSpherePoint);
+			if (sphereIntersection.point.x < 999.0f) {
+				distanceToSphere = glm::length(glm::vec3(ray.getStartPoint()) - sphereIntersection.point);
 			}
+	
+			//Check for first intersection and set the correct pixel value
+			if (distanceToSphere < distanceToTriangle) {
 
-			//Check which intersection is closest to camera
-			if (distanceToTriangle > distanceToSphere) {
+				pixelBrightness = sphereIntersection.sphere.getBrightness();
+				pixelColor = sphereIntersection.sphere.getColor()*pixelBrightness;
 
-				//Visibility test for sphere
-				Ray shadowRay = Ray(currentTrianglePoint, glm::vec3(5, 0, 4));
-				if(scene.visibilityTest(shadowRay,"sphere")) pixelBrightness = currentSphere.getBrightness();
-				else pixelBrightness = 0;
+				//Check if sphere is visible
+				shadowRay = Ray(sphereIntersection.point, glm::vec3(5, 0, 4));
+				if (!scene.isVisible(shadowRay)) pixelColor *= 0.0f;
 
-				pixelColor = currentSphere.getColor()*pixelBrightness;
-			}
-			else if(distanceToTriangle < distanceToSphere) {
+			}	
+			else if (distanceToSphere > distanceToTriangle) {
+				pixelBrightness = triangleIntersection.triangle.getBrightness();
+				pixelColor = triangleIntersection.triangle.getColor()*pixelBrightness;
 
-				//Visibility test for triangle
-				Ray shadowRay = Ray(currentTrianglePoint, glm::vec3(5, 0, 4));
-				if (currentTrianglePoint.z >= 4) pixelBrightness = currentTriangle.getBrightness();
-				else {
-					if (scene.visibilityTest(shadowRay, "triangle")) pixelBrightness = currentTriangle.getBrightness();
-					else pixelBrightness = 0;
-				}
-
-				pixelColor = currentTriangle.getColor()*pixelBrightness;
-			}
-			else {
-				std::cout << "Err: pixel (" << i << ", " << j << ")" << " has no hit." << std::endl;
-				pixelColor = glm::vec3(0, 1, 0);
+				//Check if triangle is visible
+				shadowRay = Ray(triangleIntersection.point, glm::vec3(5, 0, 4));
+				//If triangle is above lightsource !skip
+				if (triangleIntersection.point.z < 4.0f && !scene.isVisible(shadowRay)) pixelColor *= 0.0f;
 			}
 
 			//Store the highest color value
@@ -115,8 +103,8 @@ void Camera::render(Scene scene) {
 	
 	//Map the color values from the max values
 	glm::vec3 currentColor;
-	for (int i = 0; i < SIZE; i++) {
-		for (int j = 0; j < SIZE; j++) {
+	for (register size_t i = 0; i < SIZE; i++) {
+		for (register size_t j = 0; j < SIZE; j++) {
 			currentColor = image[i][j].getColor();
 			image[i][j].setColor(currentColor*(255.99f / maxVal));
 		}

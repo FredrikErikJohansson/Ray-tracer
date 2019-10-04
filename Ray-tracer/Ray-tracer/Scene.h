@@ -11,12 +11,14 @@
 
 struct TriangleIntersection {
 	Triangle triangle;
-	glm::vec3 point;
+	glm::vec3 point = glm::vec3(999.9f, 999.9f, 999.9f);
+	int n_hits = 0;
 };
 
 struct SphereIntersection {
 	Sphere sphere;
-	glm::vec3 point;
+	glm::vec3 point = glm::vec3(999.9f, 999.9f, 999.9f);
+	int n_hits = 0;
 };
 
 class Scene
@@ -25,10 +27,10 @@ public:
 	Scene();
 	~Scene();
 
-	std::list<TriangleIntersection> triangleIntersections(Ray ray) const;
-	std::list<SphereIntersection> sphereIntersections(Ray ray) const;
+	TriangleIntersection triangleIntersections(Ray ray) const;
+	SphereIntersection sphereIntersections(Ray ray) const;
 
-	bool visibilityTest(Ray shadowRay, std::string type);
+	bool isVisible(Ray shadowRay) const;
 	void createScene();
 
 private:

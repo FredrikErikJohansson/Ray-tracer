@@ -8,16 +8,16 @@
 #include "Pixel.h"
 #include "Scene.h"
 
+//SHOULD BE 800
 const int SIZE = 800;
 
 class Camera
 {
 public:
-	Camera();
+	Camera() : image(SIZE, std::vector<Pixel>(SIZE)) {};
 	~Camera();
 
 	void render(Scene scene);
-	//glm::vec3 castRays();
 
 	void createImage();
 
@@ -27,7 +27,6 @@ private:
 	glm::vec4 eye00 = glm::vec4(-2,0,0,1);
 	glm::vec4 eye01 = glm::vec4( -1,0,0,1);
 	int eyeSwitch;
-
-	Pixel image[SIZE][SIZE];
+	std::vector<std::vector<Pixel>> image;
 };
 

@@ -10,7 +10,7 @@ public:
 		startPoint = _startPoint;
 		endPoint = _endPoint;
 		direction = glm::normalize(_endPoint - _startPoint);
-		length = glm::length(_endPoint - _startPoint);
+		length = glm::length(glm::vec3(_endPoint) - glm::vec3(_startPoint));
 	}
 	Ray(glm::vec3 _startPoint, glm::vec3 _endPoint) {
 		startPoint = glm::vec4(_startPoint, 1);
