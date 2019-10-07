@@ -9,7 +9,7 @@
 #include "Scene.h"
 
 //SHOULD BE 800
-const int SIZE = 800;
+const int SIZE = 200;
 
 class Camera
 {

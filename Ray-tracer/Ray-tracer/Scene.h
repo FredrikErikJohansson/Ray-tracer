@@ -9,17 +9,16 @@
 #include "Ray.h"
 #include "Tetrahedron.h"
 
-struct TriangleIntersection {
+//TODO: Make this a class
+struct Intersection {
 	Triangle triangle;
-	glm::vec3 point = glm::vec3(999.9f, 999.9f, 999.9f);
-	int n_hits = 0;
-};
-
-struct SphereIntersection {
 	Sphere sphere;
 	glm::vec3 point = glm::vec3(999.9f, 999.9f, 999.9f);
-	int n_hits = 0;
+	std::string close = "";
+	int tri_hits = 0;
+	int sph_hits = 0;
 };
+
 
 class Scene
 {
@@ -27,8 +26,8 @@ public:
 	Scene();
 	~Scene();
 
-	TriangleIntersection triangleIntersections(Ray ray) const;
-	SphereIntersection sphereIntersections(Ray ray) const;
+	Intersection getIntersection(Ray ray) const;
+	//bool shadowIntersection(Ray ray) const;
 
 	bool isVisible(Ray shadowRay) const;
 	void createScene();

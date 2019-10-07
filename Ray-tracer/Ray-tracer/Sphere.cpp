@@ -13,7 +13,7 @@ Sphere::~Sphere()
 
 bool Sphere::rayIntersection(Ray ray, glm::vec3 &intersection) {
 	glm::vec3 rayStart = ray.getStartPoint();
-	glm::vec3 direction = glm::normalize(ray.getDirection());
+	glm::vec3 direction = ray.getDirection();
 	float b, c, d1, d2, d, x;
 
 	b = glm::dot(2.0f*direction, (rayStart - this->center));
@@ -28,6 +28,8 @@ bool Sphere::rayIntersection(Ray ray, glm::vec3 &intersection) {
 	
 	if (d1 <= 0 && d2 <= 0) return false;
 	else if (d1 < 0) d = d2;
+	else if (d2 < 0) d = d1;
+	else if (d1 < d2) d = d1;
 	else d = d2;
 
 	//Check if d is a number?
@@ -35,16 +37,10 @@ bool Sphere::rayIntersection(Ray ray, glm::vec3 &intersection) {
 	intersection = rayStart + direction * d;
 
 	glm::vec3 normal = glm::normalize(intersection - this->center);
+	Ray shadowRay = Ray(intersection, glm::vec3(5, 0, 4));
+	float shadowAngle = glm::dot(shadowRay.getDirection(), normal);
 
-	float hitAngle = acos(glm::dot(intersection, normal) / (glm::length(intersection)*glm::length(normal)));
-
-	//Check if triangle is infront of ray
-	if (hitAngle > 45.0f) return false;
-
-	glm::vec3 shadowRay = glm::vec3(5, 0, 4) - intersection;
-	float shadowAngle = glm::dot(shadowRay, normal) / (glm::length(shadowRay)*glm::length(normal));
-
-	if (shadowAngle < 0.0f) this->brightness = 0.0f;
+	if (shadowAngle < 0) this->brightness = 0.0f;
 	else this->brightness = shadowAngle;
 
 	return true;

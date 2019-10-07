@@ -2,10 +2,10 @@
 
 #include <math.h>
 #include <string>
+#include <iostream>
 
 #include "glm/glm.hpp"
 #include "Ray.h"
-
 class Sphere
 {
 public:

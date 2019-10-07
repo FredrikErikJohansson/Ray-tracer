@@ -32,10 +32,9 @@ bool Triangle::rayIntersection(Ray ray, glm::vec3 &intersection) {
 	if (u + v > 1) return false;
 
 	glm::vec3 currentHit = (1 - u - v)*v0 + u * v1 + v * v2;
-	float hitAngle = acos(glm::dot(currentHit, this->normal) / (glm::length(currentHit)*glm::length(this->normal)));
 
 	//Check if triangle is infront of ray
-	if (hitAngle > 45.0f) return false;
+	if (glm::dot(ray.getDirection(), this->normal) > 0.0f) return false;
 
 	//Make visibility test (if not visible set brightness to 0)
 	//traceShadowRay() which calls rayIntersection
