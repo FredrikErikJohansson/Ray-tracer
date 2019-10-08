@@ -27,6 +27,9 @@ public:
 	~Scene();
 
 	Intersection getIntersection(Ray ray) const;
+	Ray getReflection(Ray ray, Intersection isec) const;
+	Ray getRefraction(Ray ray, Intersection isec) const;
+
 	bool isVisible(Ray shadowRay) const;
 	void createScene();
 

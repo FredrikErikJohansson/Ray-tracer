@@ -15,7 +15,7 @@ void Material::setType(std::string _mType) {
 	mType = _mType;
 }
 
-void Material::setN(int _n) {
+void Material::setN(float _n) {
 	n = _n;
 }
 
@@ -23,6 +23,6 @@ std::string Material::getType() const {
 	return mType;
 }
 
-int Material::getN() const {
+float Material::getN() const {
 	return n;
 }

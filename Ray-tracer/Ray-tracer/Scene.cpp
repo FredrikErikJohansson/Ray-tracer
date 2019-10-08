@@ -109,10 +109,16 @@ void Scene::createScene() {
 	for (int i = 0; i < tetrahedronTriangleAmount; i++) {
 		triangles[sceneTriangles + i] = tetrahedron.getTetrahedronTriangles(i);
 	}
-	/*triangles[24].setMaterial("MIRROR");
-	triangles[25].setMaterial("MIRROR");
-	triangles[26].setMaterial("MIRROR");
-	triangles[27].setMaterial("MIRROR");*/
+	
+	triangles[24].getMaterial().setType("TRANSPARENT");
+	triangles[25].getMaterial().setType("TRANSPARENT");
+	triangles[26].getMaterial().setType("TRANSPARENT");
+	triangles[27].getMaterial().setType("TRANSPARENT");
+
+	triangles[24].getMaterial().setN(1.5f);
+	triangles[25].getMaterial().setN(1.5f);
+	triangles[26].getMaterial().setN(1.5f);
+	triangles[27].getMaterial().setN(1.5f);
 
 	//Sphere
 	spheres[0].setCenter(glm::vec3(8, 2 , 0));
@@ -143,7 +149,8 @@ Intersection Scene::getIntersection(Ray ray) const {
 			if (glm::length(intersection) < minDistance) {
 				minDistance = glm::length(intersection);
 				isec.triangle = triangle;
-				isec.point = intersection + 0.001f * triangle.getNormal();
+				//isec.point = intersection + 0.001f * triangle.getNormal();
+				isec.point = intersection;
 				isec.close = "TRIANGLE";
 			}		
 		}
@@ -155,34 +162,74 @@ Intersection Scene::getIntersection(Ray ray) const {
 			if (glm::length(intersection) < minDistance) {
 				minDistance = glm::length(intersection);
 				isec.sphere = sphere;
-				isec.point = intersection + 0.001f * glm::normalize(intersection - sphere.getCenter());
+				//isec.point = intersection + 0.001f * glm::normalize(intersection - sphere.getCenter());
+				isec.point = intersection;
 				isec.close = "SPHERE";
 			}
 		}
 	}
 
-	glm::vec3 L = ray.getDirection();
-	glm::vec3 N;
-	glm::vec3 R;
 	if (ray.getdepth() < 6) {
-		if (isec.close == "TRIANGLE" && isec.triangle.getMaterial().getType() == "MIRROR") {
-			N = isec.triangle.getNormal();
-			R = L - 2.0f*glm::dot(N, L)*N;
-			Ray reflectedRay = Ray(isec.point, R*100.0f);
-			ray++;
-			isec = this->getIntersection(reflectedRay);
+		if (isec.close == "TRIANGLE") {
+			if (isec.triangle.getMaterial().getType() == "MIRROR") {
+				ray = this->getReflection(ray, isec);
+				ray++;
+				isec = this->getIntersection(ray);
+			}
+			else if (isec.triangle.getMaterial().getType() == "TRANSPARENT") {
+				ray = this->getRefraction(ray, isec);
+				ray++;
+				isec = this->getIntersection(ray);
+			}
 		}
-		else if (isec.close == "SPHERE" && isec.sphere.getMaterial().getType() == "MIRROR") {
-			N = glm::normalize(isec.point - isec.sphere.getCenter());
-			R = L - 2.0f*glm::dot(N, L)*N;
-			Ray reflectedRay = Ray(isec.point, R*100.0f);
-			ray++;
-			isec = this->getIntersection(reflectedRay);
+		else if (isec.close == "SPHERE") {
+			if (isec.sphere.getMaterial().getType() == "MIRROR") {
+				ray = this->getReflection(ray, isec);
+				ray++;
+				isec = this->getIntersection(ray);
+			}	
+			else if (isec.triangle.getMaterial().getType() == "TRANSPARENT") {
+				ray = this->getRefraction(ray, isec);
+				ray++;
+				isec = this->getIntersection(ray);
+			}
 		}
 	}
 
+	ray--;
 	return isec;
 };
+
+Ray Scene::getReflection(Ray ray, Intersection isec) const {
+	glm::vec3 L = ray.getDirection();
+	glm::vec3 N;
+	if (isec.close == "TRIANGLE") N = isec.triangle.getNormal();
+	else if (isec.close == "SPHERE") N = glm::normalize(isec.point - isec.sphere.getCenter());
+	glm::vec3 R = glm::normalize(L - 2.0f*glm::dot(N, L)*N)*100.0f;
+	
+	return Ray(isec.point + N * 0.001f, R);
+}
+
+Ray Scene::getRefraction(Ray ray, Intersection isec) const {
+	//T=(n1/n2)*L + N*(-(n1/n2)*dot(N,L)-sqrt(1-(n1/n2)^2*(1-dot(N,L)^2)))
+	glm::vec3 L = ray.getDirection();
+	glm::vec3 N;
+	glm::vec3 T;
+	float n;
+
+	if (isec.close == "TRIANGLE") {
+		n = isec.triangle.getMaterial().getN();
+		N = isec.triangle.getNormal();
+		T = glm::normalize((1.0f / n)*L + N * (-(1.0f / n)*glm::dot(N, L) - sqrt(1.0f - pow(1.0f / n, 2.0f)*(1 - pow(glm::dot(N, L), 2.0f)))))*100.0f;
+	}
+	else if (isec.close == "SPHERE") {
+		n = isec.sphere.getMaterial().getN();
+		N = glm::normalize(isec.point - isec.sphere.getCenter());
+		T = glm::normalize((1.0f / n)*L + N * (-(1.0f / n)*glm::dot(N, L) - sqrt(1.0f - pow(1.0f / n, 2.0f)*(1 - pow(glm::dot(N, L), 2.0f)))))*100.0f;
+	}
+
+	return Ray(isec.point - N * 0.001f, T);
+}
 
 
 bool Scene::isVisible(Ray ray) const {

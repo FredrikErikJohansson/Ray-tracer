@@ -36,7 +36,7 @@ Triangle Tetrahedron::getTetrahedronTriangles(int ind) {
 Tetrahedron::Tetrahedron()
 {
 	v0 = glm::vec4(7.0f, 0.0f, -2.0f, 1.0f);
-	sideLength = 2.0f;
+	sideLength = 3.0f;
 }
 
 //Copy constructor

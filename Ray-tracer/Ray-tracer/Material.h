@@ -9,13 +9,13 @@ public:
 	~Material();
 
 	void setType(std::string _mType);
-	void setN(int _n);
+	void setN(float _n);
 
 	std::string getType() const;
-	int getN() const;
+	float getN() const;
 
 private:
 	std::string mType = "DIFFUSE";
-	int n = 1;
+	float n = 1.0f;
 };
 
