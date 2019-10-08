@@ -14,39 +14,15 @@ public:
 
 	bool rayIntersection(Ray arg, glm::vec3&);
 
-	glm::vec3 getColor() {
-		return color;
-	}
+	glm::vec3 getColor() const;
+	glm::vec3 getNormal() const;
+	float getBrightness() const;
+	std::string getMaterial() const;
 
-	glm::vec3 getNormal() {
-		return glm::normalize(normal);
-	}
-
-	float getBrightness() {
-		return brightness;
-	}
-
-	void setVertices(glm::vec4 _v0, glm::vec4 _v1, glm::vec4 _v2) {
-		v0 = _v0;
-		v1 = _v1;
-		v2 = _v2;
-	}
-
-	void setNormal(glm::vec3 _normal) {
-		normal = _normal;
-	}
-
-	void setColor(glm::vec3 _color) {
-		color = _color;
-	}
-
-	std::string getMaterial() {
-		return material;
-	}
-
-	void setMaterial(std::string _material) {
-		material = _material;
-	}
+	void setVertices(glm::vec4 _v0, glm::vec4 _v1, glm::vec4 _v2);
+	void setNormal(glm::vec3 _normal);
+	void setColor(glm::vec3 _color);
+	void setMaterial(std::string _material);
 
 private:
 	glm::vec4 v0, v1, v2;

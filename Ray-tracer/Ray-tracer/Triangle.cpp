@@ -11,6 +11,40 @@ Triangle::~Triangle()
 {
 }
 
+glm::vec3 Triangle::getColor() const {
+	return color;
+}
+
+glm::vec3 Triangle::getNormal() const {
+	return glm::normalize(normal);
+}
+
+float Triangle::getBrightness() const {
+	return brightness;
+}
+
+std::string Triangle::getMaterial() const {
+	return material;
+}
+
+void Triangle::setVertices(glm::vec4 _v0, glm::vec4 _v1, glm::vec4 _v2) {
+	v0 = _v0;
+	v1 = _v1;
+	v2 = _v2;
+}
+
+void Triangle::setNormal(glm::vec3 _normal) {
+	normal = _normal;
+}
+
+void Triangle::setColor(glm::vec3 _color) {
+	color = _color;
+}
+
+void Triangle::setMaterial(std::string _material) {
+	material = _material;
+}
+
 bool Triangle::rayIntersection(Ray ray, glm::vec3 &intersection) {
 	
 	glm::vec3 rayStart = ray.getStartPoint();

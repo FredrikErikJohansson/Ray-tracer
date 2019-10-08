@@ -18,9 +18,7 @@ public:
 	~Camera();
 
 	void render(Scene scene);
-
 	void createImage();
-
 	void setEye(int _eye);
 
 private:

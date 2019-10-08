@@ -6,35 +6,18 @@ class Ray
 {
 public:
 	Ray();
-	Ray(glm::vec4 _startPoint, glm::vec4 _endPoint) {
-		startPoint = _startPoint;
-		endPoint = _endPoint;
-		direction = glm::normalize(_endPoint - _startPoint);
-		length = glm::length(glm::vec3(_endPoint) - glm::vec3(_startPoint));
-	}
-	Ray(glm::vec3 _startPoint, glm::vec3 _endPoint) {
-		startPoint = glm::vec4(_startPoint, 1);
-		endPoint = glm::vec4(_endPoint, 1);
-		direction = glm::normalize(_endPoint - _startPoint);
-		length = glm::length(_endPoint - _startPoint);
-	}
+	Ray(glm::vec4 _startPoint, glm::vec4 _endPoint);
+	Ray(glm::vec3 _startPoint, glm::vec3 _endPoint);
 	~Ray();
 
-	glm::vec4 getStartPoint() {
-		return startPoint;
-	}
+	glm::vec4 getStartPoint() const;
+	glm::vec4 getEndPoint() const;
+	glm::vec3 getDirection() const;
+	float getLength() const;
+	int getdepth() const;
 
-	glm::vec4 getEndPoint() {
-		return endPoint;
-	}
-
-	glm::vec3 getDirection() {
-		return direction;
-	}
-
-	float getLength() {
-		return length;
-	}
+	void operator++(int);
+	void operator--(int);
 
 private:
 	glm::vec4 startPoint;
@@ -42,5 +25,6 @@ private:
 	glm::vec3 direction;
 	glm::vec3 color;
 	float length;
+	int depth;
 };
 

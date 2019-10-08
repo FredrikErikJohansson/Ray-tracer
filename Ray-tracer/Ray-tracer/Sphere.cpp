@@ -11,6 +11,39 @@ Sphere::~Sphere()
 {
 }
 
+float Sphere::getBrightness() const {
+	return brightness;
+}
+
+glm::vec3 Sphere::getColor() const {
+	return color;
+}
+
+glm::vec3 Sphere::getCenter() const {
+	return center;
+}
+
+std::string Sphere::getMaterial() const {
+	return material;
+}
+
+
+void Sphere::setColor(glm::vec3 _color) {
+	color = _color;
+}
+
+void Sphere::setCenter(glm::vec3 _center) {
+	center = _center;
+}
+
+void Sphere::setRadius(float _radius) {
+	radius = _radius;
+}
+
+void Sphere::setMaterial(std::string _material) {
+	material = _material;
+}
+
 bool Sphere::rayIntersection(Ray ray, glm::vec3 &intersection) {
 	glm::vec3 rayStart = ray.getStartPoint();
 	glm::vec3 direction = ray.getDirection();
