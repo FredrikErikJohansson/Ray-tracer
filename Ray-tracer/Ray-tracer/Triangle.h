@@ -5,6 +5,7 @@
 
 #include "glm/glm.hpp"
 #include "Ray.h"
+#include "Material.h"
 
 class Triangle
 {
@@ -17,12 +18,11 @@ public:
 	glm::vec3 getColor() const;
 	glm::vec3 getNormal() const;
 	float getBrightness() const;
-	std::string getMaterial() const;
+	Material& getMaterial();
 
 	void setVertices(glm::vec4 _v0, glm::vec4 _v1, glm::vec4 _v2);
 	void setNormal(glm::vec3 _normal);
 	void setColor(glm::vec3 _color);
-	void setMaterial(std::string _material);
 
 private:
 	glm::vec4 v0, v1, v2;
@@ -30,6 +30,6 @@ private:
 	glm::vec3 normal;
 	float brightness;
 
-	std::string material = "DIFFUSE";
+	Material material;
 };
 

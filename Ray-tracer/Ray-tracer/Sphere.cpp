@@ -23,7 +23,7 @@ glm::vec3 Sphere::getCenter() const {
 	return center;
 }
 
-std::string Sphere::getMaterial() const {
+Material& Sphere::getMaterial(){
 	return material;
 }
 
@@ -38,10 +38,6 @@ void Sphere::setCenter(glm::vec3 _center) {
 
 void Sphere::setRadius(float _radius) {
 	radius = _radius;
-}
-
-void Sphere::setMaterial(std::string _material) {
-	material = _material;
 }
 
 bool Sphere::rayIntersection(Ray ray, glm::vec3 &intersection) {

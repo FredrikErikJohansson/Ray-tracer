@@ -6,6 +6,8 @@
 
 #include "glm/glm.hpp"
 #include "Ray.h"
+#include "Material.h"
+
 class Sphere
 {
 public:
@@ -17,18 +19,17 @@ public:
 	float getBrightness() const;
 	glm::vec3 getColor() const;
 	glm::vec3 getCenter() const;
-	std::string getMaterial() const;
+	Material& getMaterial();
 
 	void setColor(glm::vec3 _color);
 	void setCenter(glm::vec3 _center);
 	void setRadius(float _radius);
-	void setMaterial(std::string _material);
 
 private:
 	glm::vec3 center;
 	glm::vec3 color;
 	float radius;
 	float brightness;
-	std::string material;
+	Material material;
 };
 

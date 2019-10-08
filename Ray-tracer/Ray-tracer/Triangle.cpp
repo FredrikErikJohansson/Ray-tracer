@@ -23,7 +23,7 @@ float Triangle::getBrightness() const {
 	return brightness;
 }
 
-std::string Triangle::getMaterial() const {
+Material& Triangle::getMaterial() {
 	return material;
 }
 
@@ -39,10 +39,6 @@ void Triangle::setNormal(glm::vec3 _normal) {
 
 void Triangle::setColor(glm::vec3 _color) {
 	color = _color;
-}
-
-void Triangle::setMaterial(std::string _material) {
-	material = _material;
 }
 
 bool Triangle::rayIntersection(Ray ray, glm::vec3 &intersection) {

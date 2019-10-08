@@ -118,7 +118,7 @@ void Scene::createScene() {
 	spheres[0].setCenter(glm::vec3(8, 2 , 0));
 	spheres[0].setRadius(2.0f);
 	spheres[0].setColor(glm::vec3(1, 0, 0));
-	spheres[0].setMaterial("MIRROR");
+	spheres[0].getMaterial().setType("MIRROR");
 
 	//DEBUGGING MIRROR
 	/*for (int i = 14; i <= 15; i++)
@@ -165,14 +165,14 @@ Intersection Scene::getIntersection(Ray ray) const {
 	glm::vec3 N;
 	glm::vec3 R;
 	if (ray.getdepth() < 6) {
-		if (isec.close == "TRIANGLE" && isec.triangle.getMaterial() == "MIRROR") {
+		if (isec.close == "TRIANGLE" && isec.triangle.getMaterial().getType() == "MIRROR") {
 			N = isec.triangle.getNormal();
 			R = L - 2.0f*glm::dot(N, L)*N;
 			Ray reflectedRay = Ray(isec.point, R*100.0f);
 			ray++;
 			isec = this->getIntersection(reflectedRay);
 		}
-		else if (isec.close == "SPHERE" && isec.sphere.getMaterial() == "MIRROR") {
+		else if (isec.close == "SPHERE" && isec.sphere.getMaterial().getType() == "MIRROR") {
 			N = glm::normalize(isec.point - isec.sphere.getCenter());
 			R = L - 2.0f*glm::dot(N, L)*N;
 			Ray reflectedRay = Ray(isec.point, R*100.0f);
