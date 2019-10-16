@@ -16,14 +16,15 @@ public:
 
 	bool rayIntersection(Ray ray, glm::vec3&);
 
-	float getBrightness() const;
-	glm::vec3 getColor() const;
-	glm::vec3 getCenter() const;
-	Material& getMaterial();
+	float getBrightness();
+	glm::vec3 getColor();
+	glm::vec3 getCenter();
+	Material getMaterial();
 
 	void setColor(glm::vec3 _color);
 	void setCenter(glm::vec3 _center);
 	void setRadius(float _radius);
+	void setMaterial(Material _material);
 
 private:
 	glm::vec3 center;

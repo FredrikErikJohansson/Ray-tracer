@@ -156,6 +156,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Intersection.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Pixel.h" />
     <ClInclude Include="Ray.h" />
@@ -166,6 +167,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Intersection.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Pixel.cpp" />
     <ClCompile Include="Ray-tracer.cpp" />

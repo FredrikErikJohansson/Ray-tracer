@@ -8,16 +8,17 @@
 #include "Sphere.h"
 #include "Ray.h"
 #include "Tetrahedron.h"
+#include "Intersection.h"
 
-//TODO: Make this a class
-struct Intersection {
+//TODO: Make this a Binary tree called intersection
+/*struct Intersection {
 	Triangle triangle;
 	Sphere sphere;
 	glm::vec3 point = glm::vec3(999.9f, 999.9f, 999.9f);
 	std::string close = "";
 	int tri_hits = 0;
 	int sph_hits = 0;
-};
+};*/
 
 
 class Scene

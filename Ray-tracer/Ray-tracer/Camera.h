@@ -7,6 +7,7 @@
 #include "glm/glm.hpp"
 #include "Pixel.h"
 #include "Scene.h"
+#include "Intersection.h"
 
 //SHOULD BE 800
 const int SIZE = 200;
@@ -22,8 +23,8 @@ public:
 	void setEye(int _eye);
 
 private:
-	glm::vec4 eye00 = glm::vec4(-2,0,0,1);
-	glm::vec4 eye01 = glm::vec4( -1,0,0,1);
+	glm::vec3 eye00 = glm::vec3(-2,0,0);
+	glm::vec3 eye01 = glm::vec3( -1,0,0);
 	int eyeSwitch;
 	std::vector<std::vector<Pixel>> image;
 };

@@ -11,19 +11,19 @@ Sphere::~Sphere()
 {
 }
 
-float Sphere::getBrightness() const {
+float Sphere::getBrightness() {
 	return brightness;
 }
 
-glm::vec3 Sphere::getColor() const {
+glm::vec3 Sphere::getColor() {
 	return color;
 }
 
-glm::vec3 Sphere::getCenter() const {
+glm::vec3 Sphere::getCenter() {
 	return center;
 }
 
-Material& Sphere::getMaterial(){
+Material Sphere::getMaterial() {
 	return material;
 }
 
@@ -38,6 +38,10 @@ void Sphere::setCenter(glm::vec3 _center) {
 
 void Sphere::setRadius(float _radius) {
 	radius = _radius;
+}
+
+void Sphere::setMaterial(Material _material) {
+	material = _material;
 }
 
 bool Sphere::rayIntersection(Ray ray, glm::vec3 &intersection) {
@@ -71,6 +75,7 @@ bool Sphere::rayIntersection(Ray ray, glm::vec3 &intersection) {
 
 	if (shadowAngle < 0) this->brightness = 0.0f;
 	else this->brightness = shadowAngle;
+	//this->brightness = shadowAngle;
 
 	return true;
 }

@@ -29,47 +29,46 @@ void Camera::render(Scene scene) {
 	float maxVal = 0;
 	Ray ray;
 	glm::vec3 currentPixel;
+	glm::vec3 eye;
+
+	if (eyeSwitch) eye = eye01;
+	else eye = eye00;
+
+	Intersection isec;
+	float pixelBrightness;
+	glm::vec3 pixelColor;
+	Ray shadowRay;
 
 	for (register size_t i = 0; i < SIZE; i++) {
 		if ( i % 10 == 0 ) std::cout << i + 1 << "/" << SIZE << std::endl;
 		for (register size_t j = 0; j < SIZE; j++) {
 
 			//Camera position
-			if (eyeSwitch) {
-				currentPixel = glm::vec3(eye01) + glm::vec3(0, i*(2.0f/SIZE) - (1-(1/SIZE)), j*(2.0f / SIZE) - (1 - (1 / SIZE))) - glm::vec3(eye01);
-				ray = Ray(eye01, glm::vec4(currentPixel, 1));
-			}
-			else {
-				currentPixel = glm::vec3(eye00) + glm::vec3(0, i*(2.0f / SIZE) - (1 - (1 / SIZE)), j*(2.0f / SIZE) - (1 - (1 / SIZE))) - glm::vec3(eye00);
-				ray = Ray(eye00, glm::vec4(currentPixel, 1));
-			}
+			currentPixel = eye + glm::vec3(0, i*(2.0f/SIZE) - (1-(1/SIZE)), j*(2.0f / SIZE) - (1 - (1 / SIZE))) - glm::vec3(eye01);
+			ray = Ray(eye01, glm::vec4(currentPixel, 1));
 
 			//Follow the ray and store the first intersection
-			Intersection isec = scene.getIntersection(ray);
-
-			float pixelBrightness;
-			glm::vec3 pixelColor;
-			Ray shadowRay;
+			isec = scene.getIntersection(ray);
 
 			//Check if we have atleast one intersection
-			if (isec.tri_hits == 0 && isec.sph_hits == 0) {
+			if (isec.getTriHits() == 0 && isec.getSphHits() == 0) {
 				std::cout << "Err: No point hit" << std::endl;
 				pixelColor = glm::vec3(0, 1, 0);
 				continue;
 			}
 
-			if (isec.close == "SPHERE") {
-				pixelBrightness = isec.sphere.getBrightness();
-				pixelColor = isec.sphere.getColor()*pixelBrightness;
+			if (isec.getClosest() == "SPHERE") {
+				pixelBrightness = isec.getSphere().getBrightness();
+				pixelColor = isec.getSphere().getColor()*pixelBrightness;
 			}
 			else {
-				pixelBrightness = isec.triangle.getBrightness();
-				pixelColor = isec.triangle.getColor()*pixelBrightness;
+				pixelBrightness = isec.getTriangle().getBrightness();
+				pixelColor = isec.getTriangle().getColor()*pixelBrightness;
 			}
 
 			//Check if the intersection is visible
-			shadowRay = Ray(isec.point, glm::vec3(5, 0, 4));
-			if (isec.point.z < 4.0f && !scene.isVisible(shadowRay)) pixelColor *= 0.0f;
+			shadowRay = Ray(isec.getPoint(), glm::vec3(5, 0, 4));
+			if (isec.getPoint().z < 4.0f && !scene.isVisible(shadowRay)) pixelColor *= 0.0f;
 
 			//Store the highest color value
 			if (glm::max(glm::max(pixelColor.x, pixelColor.y), pixelColor.z) > maxVal)
