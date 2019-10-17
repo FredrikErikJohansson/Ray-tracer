@@ -49,12 +49,12 @@ void Scene::createScene() {
 	triangles[11].setVertices(glm::vec4(13, 0, -5, 1), glm::vec4(10, 6, 5, 1), glm::vec4(13, 0, 5, 1));
 
 	//Walls colors (left)
-	triangles[6].setColor(glm::vec3(1, 0, 0));
-	triangles[7].setColor(glm::vec3(1, 0, 0));
-	triangles[8].setColor(glm::vec3(0, 1, 0));
-	triangles[9].setColor(glm::vec3(0, 1, 0));
-	triangles[10].setColor(glm::vec3(0, 0, 1));
-	triangles[11].setColor(glm::vec3(0, 0, 1));
+	triangles[6].setColor(glm::vec3(1.0f, 0.5f, 0.0f));
+	triangles[7].setColor(glm::vec3(1.0f, 0.5f, 0.0f));
+	triangles[8].setColor(glm::vec3(0.95f, 0.25f, 0.3f));
+	triangles[9].setColor(glm::vec3(0.95f, 0.25f, 0.3f));
+	triangles[10].setColor(glm::vec3(0.3f, 0.25f, 0.95f));
+	triangles[11].setColor(glm::vec3(0.3f, 0.25f, 0.95f));
 
 	//Walls normals (left)
 	triangles[6].setNormal(glm::vec3(2 / sqrt(5), -1 / sqrt(5), 0));
@@ -73,12 +73,12 @@ void Scene::createScene() {
 	triangles[17].setVertices(glm::vec4(-3, 0, -5, 1), glm::vec4(0, -6, 5, 1), glm::vec4(-3, 0, 5, 1));
 
 	//Walls colors (right)
-	triangles[12].setColor(glm::vec3(0.5, 0.5, 0));
-	triangles[13].setColor(glm::vec3(0.5, 0.5, 0));
-	triangles[14].setColor(glm::vec3(0, 0, 0.5));
-	triangles[15].setColor(glm::vec3(0, 0, 0.5));
-	triangles[16].setColor(glm::vec3(0.5, 0, 0.5));
-	triangles[17].setColor(glm::vec3(0.5, 0, 0.5));
+	triangles[12].setColor(glm::vec3(0.1f, 0.95f, 0.3f));
+	triangles[13].setColor(glm::vec3(0.1f, 0.95f, 0.3f));
+	triangles[14].setColor(glm::vec3(0.3f, 0.95f, 0.1f));
+	triangles[15].setColor(glm::vec3(0.3f, 0.95f, 0.1f));
+	triangles[16].setColor(glm::vec3(1.0f, 0.5f, 0.0f));
+	triangles[17].setColor(glm::vec3(1.0f, 0.5f, 0.0f));
 
 	//Walls normals (right)
 	triangles[12].setNormal(glm::vec3(-2 / sqrt(5), 1 / sqrt(5), 0));
@@ -124,26 +124,39 @@ void Scene::createScene() {
 	Material pureReflect;
 	pureReflect.setType("MIRROR");
 
-	triangles[24].setMaterial(pureTransp);
-	triangles[25].setMaterial(pureTransp);
-	triangles[26].setMaterial(pureTransp);
-	triangles[27].setMaterial(pureTransp);
+	triangles[24].setMaterial(pureReflect);
+	triangles[25].setMaterial(pureReflect);
+	triangles[26].setMaterial(pureReflect);
+	triangles[27].setMaterial(pureReflect);
 
-	//Sphere
-	spheres[0].setCenter(glm::vec3(8, 2, 0));
-	spheres[0].setRadius(2.0f);
+	//Spheres
+	spheres[0].setCenter(glm::vec3(5, 3, -1));
+	spheres[0].setRadius(1.0f);
 	spheres[0].setColor(glm::vec3(1, 0, 0));
-	spheres[0].setMaterial(pureReflect);
+	spheres[0].setMaterial(pureTransp);
+
+	spheres[1].setCenter(glm::vec3(10, 0, 0));
+	spheres[1].setRadius(1.0f);
+	spheres[1].setColor(glm::vec3(1, 1, 0));
+	//spheres[1].setMaterial(pureTransp);
+
+	spheres[2].setCenter(glm::vec3(5, -3, -2));
+	spheres[2].setRadius(1.0f);
+	spheres[2].setColor(glm::vec3(0, 1, 0));
+	//spheres[2].setMaterial(pureTransp);
 
 	//DEBUGGING MIRROR
-	/*for (int i = 0; i <= 27; i++)
+	for (int i = 14; i <= 15; i++)
 	{
 		triangles[i].setMaterial(pureReflect);
-	}*/
+	}
 }
 
-Intersection* Scene::getIntersection(Ray ray, Intersection* root) const {
+glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) const {
 
+	float importanceVar = 1.0f;
+
+	glm::vec3 color = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 intersection;
 	float minDistance = 1000.0f;
 	for (Triangle triangle : triangles) {
@@ -152,7 +165,7 @@ Intersection* Scene::getIntersection(Ray ray, Intersection* root) const {
 			if (glm::length(intersection) < minDistance) {
 				minDistance = glm::length(intersection);
 				root->triangle = triangle;
-				root->point = intersection;
+				root->point = intersection + 0.001f * triangle.getNormal();
 				root->closest = "TRIANGLE";
 			}
 		}
@@ -163,9 +176,8 @@ Intersection* Scene::getIntersection(Ray ray, Intersection* root) const {
 			//Distance calculation between sphere & triangles are wrong (maybe)
 			if (glm::length(intersection) < minDistance) {
 				minDistance = glm::length(intersection);
-				
+
 				root->sphere = sphere;
-				//isec.point = intersection + 0.001f * glm::normalize(intersection - sphere.getCenter());
 				root->point = intersection + 0.001f * glm::normalize(intersection - sphere.getCenter());
 				root->closest = "SPHERE";
 			}
@@ -175,56 +187,63 @@ Intersection* Scene::getIntersection(Ray ray, Intersection* root) const {
 	if (ray.getdepth() < 6) {
 		if (root->closest == "TRIANGLE") {
 			if (root->triangle.getMaterial().getType() == "MIRROR") {
-
 				root->R = new Intersection();
 				root->R->Parent = root;
 				root->R->R = nullptr;
 				root->R->T = nullptr;
 
-				ray = this->getReflection(ray, root);
+				importanceVar = 1.0f;
 				ray++;
-				root = this->getIntersection(ray, root->R);
+				color = this->getIntersection(this->getReflection(ray, root), root->R)*importanceVar;
 			}
 			else if (root->triangle.getMaterial().getType() == "TRANSPARENT") {
+				root->R = new Intersection();
+				root->R->Parent = root;
+				root->R->R = nullptr;
+				root->R->T = nullptr;
 
 				root->T = new Intersection();
 				root->T->Parent = root;
 				root->T->R = nullptr;
 				root->T->T = nullptr;
 
-				ray = this->getRefraction(ray, root);
+				importanceVar = 0.2f;
 				ray++;
-				root = this->getIntersection(ray, root->T);
+				color = this->getIntersection(this->getReflection(ray, root), root->R)*importanceVar + this->getIntersection(this->getRefraction(ray, root), root->T)*(1.0f-importanceVar);
 			}
 		}
 		else if (root->closest == "SPHERE") {
 			if (root->sphere.getMaterial().getType() == "MIRROR") {
-
 				root->R = new Intersection();
 				root->R->Parent = root;
 				root->R->R = nullptr;
 				root->R->T = nullptr;
 
-				ray = this->getReflection(ray, root);
+				importanceVar = 1.0f;
 				ray++;
-				root = this->getIntersection(ray, root->R);
+				color = this->getIntersection(this->getReflection(ray, root), root->R)*importanceVar;
 			}
 			else if (root->sphere.getMaterial().getType() == "TRANSPARENT") {
+				root->R = new Intersection();
+				root->R->Parent = root;
+				root->R->R = nullptr;
+				root->R->T = nullptr;
 
 				root->T = new Intersection();
 				root->T->Parent = root;
 				root->T->R = nullptr;
 				root->T->T = nullptr;
 
-				ray = this->getRefraction(ray, root);
+				importanceVar = 0.2f;
 				ray++;
-				root = this->getIntersection(ray, root->T);
+				color = this->getIntersection(this->getReflection(ray, root), root->R)*importanceVar + this->getIntersection(this->getRefraction(ray, root), root->T)*(1.0f-importanceVar);
 			}
 		}
 	}
 
 	ray--;
 
+	//Doesnt seem to do anything?
 	//Calculates the radiance of the root using Li=(Wr*Lr+Wt*Lt)/Wi
 	if (root->R != nullptr && root->T != nullptr)
 		root->radiance += ((root->R->radiance*root->R->importance) + (root->T->radiance*root->T->importance)) / root->importance;
@@ -235,12 +254,18 @@ Intersection* Scene::getIntersection(Ray ray, Intersection* root) const {
 
 
 	//Adds radiance from brightness
-	if (root->closest == "TRIANGLE")
-		root->radiance += root->triangle.getBrightness();
-	else if (root->closest == "SPHERE")
-		root->radiance += root->sphere.getBrightness();
-
-	return root;
+	if (root->R == nullptr && root->T == nullptr) {
+		if (root->closest == "TRIANGLE") {
+			root->radiance += root->triangle.getBrightness();
+			color = root->triangle.getColor()*root->radiance;
+		}
+		else if (root->closest == "SPHERE") {
+			root->radiance += root->sphere.getBrightness();
+			color = root->sphere.getColor()*root->radiance;
+		}
+	}
+	
+	return color;
 };
 
 Ray Scene::getReflection(Ray ray, Intersection* leaf) const {
@@ -271,7 +296,8 @@ Ray Scene::getRefraction(Ray ray, Intersection* leaf) const {
 		T = glm::normalize((1.0f / n)*L + N * (-(1.0f / n)*glm::dot(N, L) - sqrt(1.0f - pow(1.0f / n, 2.0f)*(1 - pow(glm::dot(N, L), 2.0f)))))*100.0f;
 	}
 
-	return Ray(leaf->point - N * 0.001f, T);
+	//Should be 0.001f but that gives stack overflow when a sphere is transparent
+	return Ray(leaf->point - N * 0.1f, T);
 }
 
 
@@ -291,7 +317,7 @@ bool Scene::isVisible(Ray ray) const {
 			//if (glm::length(intersection) < distance)
 			return false;
 			//Something is wrong with sphere distance
-				
+
 		}
 	}
 

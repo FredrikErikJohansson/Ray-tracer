@@ -5,8 +5,9 @@
 
 struct Intersection {
 
-	float radiance;
+	float radiance = 0.0f;
 	float importance = 1.0f;
+	glm::vec3 color = glm::vec3(0.0f, 0.0f, 0.0f);
 	Triangle triangle;
 	Sphere sphere;
 	glm::vec3 point = glm::vec3(999.9f, 999.9f, 999.9f);

@@ -30,7 +30,7 @@ public:
 	bool isVisible(Ray shadowRay) const;
 
 	void createScene();
-	Intersection* getIntersection(Ray ray, Intersection* root) const;
+	glm::vec3 getIntersection(Ray ray, Intersection* root) const;
 	Ray getReflection(Ray ray, Intersection* leaf) const;
 	Ray getRefraction(Ray ray, Intersection* leaf) const;
 
@@ -45,6 +45,6 @@ private:
 	Tetrahedron tetrahedron;
 	Triangle triangles[28];
 
-	Sphere spheres[1];
+	Sphere spheres[3];
 };
 

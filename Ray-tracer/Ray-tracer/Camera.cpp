@@ -50,31 +50,11 @@ void Camera::render(Scene scene) {
 			ray = Ray(eye01, glm::vec4(currentPixel, 1));
 
 			//Follow the ray and store the first intersection
-			//This should be the root of isec
-			//maybe make getIntersection void and have isec as a parameter.
-			Intersection* asd = new Intersection;
-			Intersection* parent = new Intersection;
-			asd->Parent = parent;
-			asd->T = nullptr;
-			asd->R = nullptr;
-			Intersection* root = scene.getIntersection(ray, asd);
-			//getIntersection(ray);
-
-			//Check if we have atleast one intersection
-			if (root->triHits == 0 && root->sphHits == 0) {
-				//std::cout << "Err: No point hit" << std::endl;
-				pixelColor = glm::vec3(0, 1, 0);
-				continue;
-			}
-
-			if (root->closest == "SPHERE") {
-				pixelBrightness = root->sphere.getBrightness();
-				pixelColor = root->sphere.getColor()*pixelBrightness;
-			}
-			else {
-				pixelBrightness = root->triangle.getBrightness();
-				pixelColor = root->triangle.getColor()*pixelBrightness;
-			}
+			Intersection* root = new Intersection;
+			root->R = nullptr;
+			root->T = nullptr;
+			glm::vec3 pixelColor = glm::vec3(0.0f,0.0f,0.0f);
+			pixelColor = scene.getIntersection(ray, root);
 
 			//Check if the intersection is visible
 			shadowRay = Ray(root->point, glm::vec3(5, 0, 4));

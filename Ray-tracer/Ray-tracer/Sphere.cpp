@@ -65,11 +65,16 @@ bool Sphere::rayIntersection(Ray ray, glm::vec3 &intersection) {
 	else if (d1 < d2) d = d1;
 	else d = d2;
 
+
 	//Check if d is a number?
 	if (d < FLT_EPSILON || d > 1000.0f) return false;
 	intersection = rayStart + direction * d;
 
 	glm::vec3 normal = glm::normalize(intersection - this->center);
+
+	//Check if sphere is infront of ray
+	if (glm::dot(ray.getDirection(), normal) > 0.0f) return false;
+
 	Ray shadowRay = Ray(intersection, glm::vec3(5, 0, 4));
 	float shadowAngle = glm::dot(shadowRay.getDirection(), normal);
 
