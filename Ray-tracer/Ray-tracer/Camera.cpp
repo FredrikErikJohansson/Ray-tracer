@@ -34,10 +34,12 @@ void Camera::render(Scene scene) {
 	if (eyeSwitch) eye = eye01;
 	else eye = eye00;
 
-	Intersection isec;
+	//Intersection isec;
 	float pixelBrightness;
 	glm::vec3 pixelColor;
 	Ray shadowRay;
+
+	IntersectionTree * iTree = new IntersectionTree();
 
 	for (register size_t i = 0; i < SIZE; i++) {
 		if ( i % 10 == 0 ) std::cout << i + 1 << "/" << SIZE << std::endl;
@@ -48,27 +50,35 @@ void Camera::render(Scene scene) {
 			ray = Ray(eye01, glm::vec4(currentPixel, 1));
 
 			//Follow the ray and store the first intersection
-			isec = scene.getIntersection(ray);
+			//This should be the root of isec
+			//maybe make getIntersection void and have isec as a parameter.
+			Intersection* asd = new Intersection;
+			Intersection* parent = new Intersection;
+			asd->Parent = parent;
+			asd->T = nullptr;
+			asd->R = nullptr;
+			Intersection* root = scene.getIntersection(ray, asd);
+			//getIntersection(ray);
 
 			//Check if we have atleast one intersection
-			if (isec.getTriHits() == 0 && isec.getSphHits() == 0) {
-				std::cout << "Err: No point hit" << std::endl;
+			if (root->triHits == 0 && root->sphHits == 0) {
+				//std::cout << "Err: No point hit" << std::endl;
 				pixelColor = glm::vec3(0, 1, 0);
 				continue;
 			}
 
-			if (isec.getClosest() == "SPHERE") {
-				pixelBrightness = isec.getSphere().getBrightness();
-				pixelColor = isec.getSphere().getColor()*pixelBrightness;
+			if (root->closest == "SPHERE") {
+				pixelBrightness = root->sphere.getBrightness();
+				pixelColor = root->sphere.getColor()*pixelBrightness;
 			}
 			else {
-				pixelBrightness = isec.getTriangle().getBrightness();
-				pixelColor = isec.getTriangle().getColor()*pixelBrightness;
+				pixelBrightness = root->triangle.getBrightness();
+				pixelColor = root->triangle.getColor()*pixelBrightness;
 			}
 
 			//Check if the intersection is visible
-			shadowRay = Ray(isec.getPoint(), glm::vec3(5, 0, 4));
-			if (isec.getPoint().z < 4.0f && !scene.isVisible(shadowRay)) pixelColor *= 0.0f;
+			shadowRay = Ray(root->point, glm::vec3(5, 0, 4));
+			if (root->point.z < 4.0f && !scene.isVisible(shadowRay)) pixelColor *= 0.0f;
 
 			//Store the highest color value
 			if (glm::max(glm::max(pixelColor.x, pixelColor.y), pixelColor.z) > maxVal)
@@ -77,6 +87,8 @@ void Camera::render(Scene scene) {
 			image[i][j].setColor(pixelColor.x, pixelColor.y, pixelColor.z);
 		}
 	}
+
+	delete iTree;
 	
 	//Map the color values from the max values
 	glm::vec3 currentColor;

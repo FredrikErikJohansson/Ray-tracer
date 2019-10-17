@@ -8,7 +8,7 @@
 #include "Sphere.h"
 #include "Ray.h"
 #include "Tetrahedron.h"
-#include "Intersection.h"
+#include "IntersectionTree.h"
 
 //TODO: Make this a Binary tree called intersection
 /*struct Intersection {
@@ -27,12 +27,12 @@ public:
 	Scene();
 	~Scene();
 
-	Intersection getIntersection(Ray ray) const;
-	Ray getReflection(Ray ray, Intersection isec) const;
-	Ray getRefraction(Ray ray, Intersection isec) const;
-
 	bool isVisible(Ray shadowRay) const;
+
 	void createScene();
+	Intersection* getIntersection(Ray ray, Intersection* root) const;
+	Ray getReflection(Ray ray, Intersection* leaf) const;
+	Ray getRefraction(Ray ray, Intersection* leaf) const;
 
 private:
 

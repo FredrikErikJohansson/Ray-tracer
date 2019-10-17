@@ -25,7 +25,6 @@ private:
 	glm::vec3 direction;
 	glm::vec3 color;
 	float length;
-	float importance;
 	int depth = 1;
 };
 

@@ -7,7 +7,7 @@
 #include "glm/glm.hpp"
 #include "Pixel.h"
 #include "Scene.h"
-#include "Intersection.h"
+#include "IntersectionTree.h"
 
 //SHOULD BE 800
 const int SIZE = 200;

@@ -7,8 +7,15 @@ Scene::Scene()
 	tetrahedron.createTetrahedron();
 }
 
+
+
+
+Scene::~Scene()
+{
+}
+
 void Scene::createScene() {
-	
+
 	//Floor vertices
 	triangles[0].setVertices(glm::vec4(-3, 0, -5, 1), glm::vec4(5, 0, -5, 1), glm::vec4(0, -6, -5, 1));
 	triangles[1].setVertices(glm::vec4(0, -6, -5, 1), glm::vec4(5, 0, -5, 1), glm::vec4(10, -6, -5, 1));
@@ -104,12 +111,12 @@ void Scene::createScene() {
 	triangles[21].setNormal(glm::vec3(0, 0, -1));
 	triangles[22].setNormal(glm::vec3(0, 0, -1));
 	triangles[23].setNormal(glm::vec3(0, 0, -1));
-	
+
 	//Get the triangles of the tetrahedron
 	for (int i = 0; i < tetrahedronTriangleAmount; i++) {
 		triangles[sceneTriangles + i] = tetrahedron.getTetrahedronTriangles(i);
 	}
-	
+
 	Material pureTransp;
 	pureTransp.setType("TRANSPARENT");
 	pureTransp.setN(1.5f);
@@ -123,115 +130,151 @@ void Scene::createScene() {
 	triangles[27].setMaterial(pureTransp);
 
 	//Sphere
-	spheres[0].setCenter(glm::vec3(8, 2 , 0));
+	spheres[0].setCenter(glm::vec3(8, 2, 0));
 	spheres[0].setRadius(2.0f);
 	spheres[0].setColor(glm::vec3(1, 0, 0));
-	//spheres[0].setMaterial(pureReflect);
+	spheres[0].setMaterial(pureReflect);
 
 	//DEBUGGING MIRROR
-	/*for (int i = 14; i <= 15; i++)
+	/*for (int i = 0; i <= 27; i++)
 	{
-		triangles[i].setMaterial("MIRROR");
+		triangles[i].setMaterial(pureReflect);
 	}*/
 }
 
+Intersection* Scene::getIntersection(Ray ray, Intersection* root) const {
 
-Scene::~Scene()
-{
-}
-
-
-Intersection Scene::getIntersection(Ray ray) const {
-	Intersection isec;
 	glm::vec3 intersection;
 	float minDistance = 1000.0f;
 	for (Triangle triangle : triangles) {
 		if (triangle.rayIntersection(ray, intersection)) {
-			isec.incrementTriHits();
+			root->triHits++;
 			if (glm::length(intersection) < minDistance) {
 				minDistance = glm::length(intersection);
-				isec.setTriangle(triangle);
-				//isec.point = intersection + 0.001f * triangle.getNormal();
-				isec.setPoint(intersection);
-				isec.setClosest("TRIANGLE");
-			}		
+				root->triangle = triangle;
+				root->point = intersection;
+				root->closest = "TRIANGLE";
+			}
 		}
 	}
 	for (Sphere sphere : spheres) {
 		if (sphere.rayIntersection(ray, intersection)) {
-			isec.incrementSphHits();
+			root->sphHits++;
 			//Distance calculation between sphere & triangles are wrong (maybe)
 			if (glm::length(intersection) < minDistance) {
 				minDistance = glm::length(intersection);
-				isec.setSphere(sphere);
+				
+				root->sphere = sphere;
 				//isec.point = intersection + 0.001f * glm::normalize(intersection - sphere.getCenter());
-				isec.setPoint(intersection + 0.001f * glm::normalize(intersection - sphere.getCenter()));
-				isec.setClosest("SPHERE");
+				root->point = intersection + 0.001f * glm::normalize(intersection - sphere.getCenter());
+				root->closest = "SPHERE";
 			}
 		}
 	}
 
 	if (ray.getdepth() < 6) {
-		if (isec.getClosest() == "TRIANGLE") {
-			if (isec.getTriangle().getMaterial().getType() == "MIRROR") {
-				ray = this->getReflection(ray, isec);
+		if (root->closest == "TRIANGLE") {
+			if (root->triangle.getMaterial().getType() == "MIRROR") {
+
+				root->R = new Intersection();
+				root->R->Parent = root;
+				root->R->R = nullptr;
+				root->R->T = nullptr;
+
+				ray = this->getReflection(ray, root);
 				ray++;
-				isec = this->getIntersection(ray);
+				root = this->getIntersection(ray, root->R);
 			}
-			else if (isec.getTriangle().getMaterial().getType() == "TRANSPARENT") {
-				ray = this->getRefraction(ray, isec);
+			else if (root->triangle.getMaterial().getType() == "TRANSPARENT") {
+
+				root->T = new Intersection();
+				root->T->Parent = root;
+				root->T->R = nullptr;
+				root->T->T = nullptr;
+
+				ray = this->getRefraction(ray, root);
 				ray++;
-				isec = this->getIntersection(ray);
+				root = this->getIntersection(ray, root->T);
 			}
 		}
-		else if (isec.getClosest() == "SPHERE") {
-			if (isec.getSphere().getMaterial().getType() == "MIRROR") {
-				ray = this->getReflection(ray, isec);
+		else if (root->closest == "SPHERE") {
+			if (root->sphere.getMaterial().getType() == "MIRROR") {
+
+				root->R = new Intersection();
+				root->R->Parent = root;
+				root->R->R = nullptr;
+				root->R->T = nullptr;
+
+				ray = this->getReflection(ray, root);
 				ray++;
-				isec = this->getIntersection(ray);
-			}	
-			else if (isec.getTriangle().getMaterial().getType() == "TRANSPARENT") {
-				ray = this->getRefraction(ray, isec);
+				root = this->getIntersection(ray, root->R);
+			}
+			else if (root->sphere.getMaterial().getType() == "TRANSPARENT") {
+
+				root->T = new Intersection();
+				root->T->Parent = root;
+				root->T->R = nullptr;
+				root->T->T = nullptr;
+
+				ray = this->getRefraction(ray, root);
 				ray++;
-				isec = this->getIntersection(ray);
+				root = this->getIntersection(ray, root->T);
 			}
 		}
 	}
 
 	ray--;
-	return isec;
+
+	//Calculates the radiance of the root using Li=(Wr*Lr+Wt*Lt)/Wi
+	if (root->R != nullptr && root->T != nullptr)
+		root->radiance += ((root->R->radiance*root->R->importance) + (root->T->radiance*root->T->importance)) / root->importance;
+	else if (root->R != nullptr)
+		root->radiance += (root->R->radiance*root->R->importance) / root->importance;
+	else if (root->T != nullptr)
+		root->radiance += (root->T->radiance*root->T->importance) / root->importance;
+
+
+	//Adds radiance from brightness
+	if (root->closest == "TRIANGLE")
+		root->radiance += root->triangle.getBrightness();
+	else if (root->closest == "SPHERE")
+		root->radiance += root->sphere.getBrightness();
+
+	return root;
 };
 
-Ray Scene::getReflection(Ray ray, Intersection isec) const {
+Ray Scene::getReflection(Ray ray, Intersection* leaf) const {
 	glm::vec3 L = ray.getDirection();
 	glm::vec3 N;
-	if (isec.getClosest() == "TRIANGLE") N = isec.getTriangle().getNormal();
-	else if (isec.getClosest() == "SPHERE") N = glm::normalize(isec.getPoint() - isec.getSphere().getCenter());
+	if (leaf->closest == "TRIANGLE") N = leaf->triangle.getNormal();
+	else if (leaf->closest == "SPHERE") N = glm::normalize(leaf->point - leaf->sphere.getCenter());
 	glm::vec3 R = glm::normalize(L - 2.0f*glm::dot(N, L)*N)*100.0f;
-	
-	return Ray(isec.getPoint() + N * 0.001f, R);
+
+	return Ray(leaf->point + N * 0.001f, R);
 }
 
-Ray Scene::getRefraction(Ray ray, Intersection isec) const {
+Ray Scene::getRefraction(Ray ray, Intersection* leaf) const {
 	//T=(n1/n2)*L + N*(-(n1/n2)*dot(N,L)-sqrt(1-(n1/n2)^2*(1-dot(N,L)^2)))
 	glm::vec3 L = ray.getDirection();
 	glm::vec3 N;
 	glm::vec3 T;
 	float n;
 
-	if (isec.getClosest() == "TRIANGLE") {
-		n = isec.getTriangle().getMaterial().getN();
-		N = isec.getTriangle().getNormal();
+	if (leaf->closest == "TRIANGLE") {
+		n = leaf->triangle.getMaterial().getN();
+		N = leaf->triangle.getNormal();
 		T = glm::normalize((1.0f / n)*L + N * (-(1.0f / n)*glm::dot(N, L) - sqrt(1.0f - pow(1.0f / n, 2.0f)*(1 - pow(glm::dot(N, L), 2.0f)))))*100.0f;
 	}
-	else if (isec.getClosest() == "SPHERE") {
-		n = isec.getSphere().getMaterial().getN();
-		N = glm::normalize(isec.getPoint() - isec.getSphere().getCenter());
+	else if (leaf->closest == "SPHERE") {
+		n = leaf->sphere.getMaterial().getN();
+		N = glm::normalize(leaf->point - leaf->sphere.getCenter());
 		T = glm::normalize((1.0f / n)*L + N * (-(1.0f / n)*glm::dot(N, L) - sqrt(1.0f - pow(1.0f / n, 2.0f)*(1 - pow(glm::dot(N, L), 2.0f)))))*100.0f;
 	}
 
-	return Ray(isec.getPoint() - N * 0.001f, T);
+	return Ray(leaf->point - N * 0.001f, T);
 }
+
+
 
 
 bool Scene::isVisible(Ray ray) const {

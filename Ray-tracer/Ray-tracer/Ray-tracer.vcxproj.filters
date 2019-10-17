@@ -39,7 +39,7 @@
     <ClInclude Include="Material.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Intersection.h">
+    <ClInclude Include="IntersectionTree.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -71,7 +71,7 @@
     <ClCompile Include="Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Intersection.cpp">
+    <ClCompile Include="IntersectionTree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
