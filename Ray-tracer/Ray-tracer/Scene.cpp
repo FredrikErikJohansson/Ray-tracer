@@ -255,23 +255,30 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) const {
 
 	//Check if the intersection is visible
 	//TODO: Add area lightsource
-	//float xx = ((float)rand() / RAND_MAX) * (6 - 4) + 4;
-	//float yy = ((float)rand() / RAND_MAX) * (1 + 1) - 1;
-
-	Ray shadowRay = Ray(root->point, glm::vec3(5.0f, 0.0f, 4.95f));
+	float xx;
+	float yy;
 	float D = 0.1f;
-	if (!this->isVisible(shadowRay)) D *= 0.0f;
 
+	for (int i = 0; i < 4; i++) {
+		xx = ((float)rand() / RAND_MAX) * (6 - 4) + 4;
+		yy = ((float)rand() / RAND_MAX) * (1 + 1) - 1;
+
+		Ray shadowRay = Ray(root->point, glm::vec3(xx, yy, 4.0f));
+
+		if (!this->isVisible(shadowRay)) D *= 0.0f;
+	}
 	
 
+	
+	//Refers to "commented"
 	//Adds radiance from lightsource at Intersections (D*(the angle of the normal from the lightsource))
 	//Only intersections which are transparent
-	/*if (root->closest == "TRIANGLE" && root->triangle.getMaterial().getType() == "TRANSPARENT") {
+	if (root->closest == "TRIANGLE" && root->triangle.getMaterial().getType() == "TRANSPARENT") {
 		root->radiance += root->triangle.getBrightness()*D;
 	}
 	else if (root->closest == "SPHERE" && root->sphere.getMaterial().getType() == "TRANSPARENT") {
 		root->radiance += root->sphere.getBrightness()*D;
-	}*/
+	}
 
 	//This is a diffuse hit
 	//TODO: Add multiple shadowrays and lambertian model for endpoints

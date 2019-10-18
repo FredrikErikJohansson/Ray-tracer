@@ -10,7 +10,7 @@
 #include "IntersectionTree.h"
 
 //SHOULD BE 800
-const int SIZE = 200;
+const int SIZE = 800;
 
 class Camera
 {
