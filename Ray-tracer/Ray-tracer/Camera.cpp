@@ -55,10 +55,7 @@ void Camera::render(Scene scene) {
 			root->T = nullptr;
 			glm::vec3 pixelColor = glm::vec3(0.0f,0.0f,0.0f);
 			pixelColor = scene.getIntersection(ray, root);
-
-			//Check if the intersection is visible
-			shadowRay = Ray(root->point, glm::vec3(5, 0, 4));
-			if (root->point.z < 4.0f && !scene.isVisible(shadowRay)) pixelColor *= 0.0f;
+			pixelColor *= root->radiance;
 
 			//Store the highest color value
 			if (glm::max(glm::max(pixelColor.x, pixelColor.y), pixelColor.z) > maxVal)
