@@ -27,10 +27,8 @@ void Camera::createImage() {
 
 void Camera::render(Scene scene) {
 	float maxVal = 0;
-	float step = (1.0f / 3.0f*SIZE);
 	Ray ray;
 	glm::vec3 currentPixel;
-	glm::vec3 currentSubPixel;
 	glm::vec3 eye;
 
 	if (eyeSwitch) eye = eye01;
@@ -41,7 +39,6 @@ void Camera::render(Scene scene) {
 
 	//Intersection isec;
 	glm::vec3 pixelColor;
-	Ray shadowRay;
 
 	IntersectionTree * iTree = new IntersectionTree();
 
@@ -77,13 +74,6 @@ void Camera::render(Scene scene) {
 			}
 			pixelColor /= SUB_SIZE * SUB_SIZE;
 
-			//Give light source color
-			if (root->point.x >= 4 && root->point.x <= 6)
-				if (root->point.y >= -1 && root->point.y <= 1)
-					if (root->point.z > 4.9f)
-						pixelColor = glm::vec3(1, 1, 1);
-
-
 			/*//Multi rays SUB_SIZE = 2 (2x2)
 			//Dont forget to change SUB_SIZE
 			currentPixel.y -= 1 / (4 * SIZE);
@@ -98,6 +88,11 @@ void Camera::render(Scene scene) {
 			}
 			pixelColor /= SUB_SIZE * SUB_SIZE;*/
 			
+			//Give light source color
+			if (root->point.x >= 4 && root->point.x <= 6)
+				if (root->point.y >= -1 && root->point.y <= 1)
+					if (root->point.z > 4.9f)
+						pixelColor = glm::vec3(1, 1, 1);
 
 			//Store the highest color value
 			if (glm::max(glm::max(pixelColor.x, pixelColor.y), pixelColor.z) > maxVal)

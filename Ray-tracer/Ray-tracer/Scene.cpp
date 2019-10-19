@@ -301,6 +301,7 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) const {
 	return color;
 };
 
+
 Ray Scene::getReflection(Ray ray, Intersection* leaf) const {
 	glm::vec3 L = ray.getDirection();
 	glm::vec3 N;

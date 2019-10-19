@@ -4,7 +4,6 @@
 #include "Scene.h"
 #include "Camera.h"
 #include "Pixel.h"
-#include <iostream>
 
 int main()
 {
