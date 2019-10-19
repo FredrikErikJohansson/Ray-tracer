@@ -33,18 +33,16 @@ void Camera::render(Scene scene) {
 
 	if (eyeSwitch) eye = eye01;
 	else eye = eye00;
+	glm::vec3 pixelColor;
 
 	double start, end, runTime;
 	start = omp_get_wtime();
 
-	//Intersection isec;
-	glm::vec3 pixelColor;
-
 	IntersectionTree * iTree = new IntersectionTree();
-
+	
 	for (int i = 0; i < SIZE; i++) {
 		if ( i % 10 == 0 ) std::cout << i + 1 << "/" << SIZE << std::endl;
-		#pragma omp parallel for
+		#pragma omp parallel for private(pixelColor, currentPixel) schedule(dynamic,1)
 		for (int j = 0; j < SIZE; j++) {
 
 			//Camera position
