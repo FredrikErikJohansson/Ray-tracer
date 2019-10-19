@@ -134,14 +134,14 @@ void Scene::createScene() {
 	spheres[0].setCenter(glm::vec3(5, 3, -1));
 	spheres[0].setRadius(1.0f);
 	spheres[0].setColor(glm::vec3(1, 0, 0));
-	spheres[0].setMaterial(pureTransp);
+	//spheres[0].setMaterial(pureTransp);
 
 	spheres[1].setCenter(glm::vec3(10, 0, 0));
 	spheres[1].setRadius(1.0f);
 	spheres[1].setColor(glm::vec3(1, 1, 0));
 	//spheres[1].setMaterial(pureTransp);
 
-	spheres[2].setCenter(glm::vec3(5, -3, -2));
+	spheres[2].setCenter(glm::vec3(5, -3, -3));
 	spheres[2].setRadius(1.0f);
 	spheres[2].setColor(glm::vec3(0, 1, 0));
 	//spheres[2].setMaterial(pureTransp);
@@ -257,39 +257,42 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) const {
 	//TODO: Add area lightsource
 	float xx;
 	float yy;
-	float D = 0.1f;
+	float D = 0.0f;
+	int const numberOfShadowRays = 10;
 
-	for (int i = 0; i < 8; i++) {
+	for (int i = 0; i < numberOfShadowRays; i++) {
 		xx = ((float)rand() / RAND_MAX) * (6 - 4) + 4;
 		yy = ((float)rand() / RAND_MAX) * (1 + 1) - 1;
 
-		Ray shadowRay = Ray(root->point, glm::vec3(xx, yy, 4.0f));
+		Ray shadowRay = Ray(root->point, glm::vec3(xx, yy, 4.95f));
 
-		if (!this->isVisible(shadowRay)) D *= 0.0f;
+		if (!this->isVisible(shadowRay)) continue;
+
+		D += 1.0f/ numberOfShadowRays;
+	}
+
+	//Diffuse hit
+	if (root->R == nullptr && root->T == nullptr) {
+		if (root->closest == "TRIANGLE") {
+			root->radiance = root->triangle.getBrightness()*D;
+			color = root->triangle.getColor()*root->radiance;
+		}
+		else if (root->closest == "SPHERE") {
+			root->radiance = root->sphere.getBrightness()*D;
+			color = root->sphere.getColor()*root->radiance;
+		}
 	}
 	
 	//Refers to "commented"
 	//Adds radiance from lightsource at Intersections (D*(the angle of the normal from the lightsource))
 	//Only intersections which are transparent
-	if (root->closest == "TRIANGLE" && root->triangle.getMaterial().getType() == "TRANSPARENT") {
+	/*if (root->closest == "TRIANGLE" && root->triangle.getMaterial().getType() == "TRANSPARENT") {
 		root->radiance += root->triangle.getBrightness()*D;
 	}
 	else if (root->closest == "SPHERE" && root->sphere.getMaterial().getType() == "TRANSPARENT") {
 		root->radiance += root->sphere.getBrightness()*D;
-	}
+	}*/
 
-	//This is a diffuse hit
-	//TODO: Add multiple shadowrays and lambertian model for endpoints
-	if (root->R == nullptr && root->T == nullptr) {
-		if (root->closest == "TRIANGLE") {
-			root->radiance += root->triangle.getBrightness()*D;
-			color = root->triangle.getColor()*root->radiance;
-		}
-		else if (root->closest == "SPHERE") {
-			root->radiance += root->sphere.getBrightness()*D;
-			color = root->sphere.getColor()*root->radiance;
-		}
-	}
 	
 	return color;
 };

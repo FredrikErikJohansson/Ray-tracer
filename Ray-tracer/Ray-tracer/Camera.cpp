@@ -40,9 +40,7 @@ void Camera::render(Scene scene) {
 	start = omp_get_wtime();
 
 	//Intersection isec;
-	float pixelBrightness;
-	glm::vec3 pixelColor = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 subPixelColor = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 pixelColor;
 	Ray shadowRay;
 
 	IntersectionTree * iTree = new IntersectionTree();
@@ -54,64 +52,50 @@ void Camera::render(Scene scene) {
 
 			//Camera position
 			currentPixel = eye + glm::vec3(0, i*(2.0f / SIZE) - (1 - (1 / SIZE)), j*(2.0f / SIZE) - (1 - (1 / SIZE))) - glm::vec3(eye);
-			currentSubPixel = currentPixel;
-			//current steglängd for 800x800 = 0.00125 (1/SIZE)
-			//we want to split that into 1/4 => 1/(4*SIZE)
-			//Then add that into x and y
-			//currentPixel = glm::vec3(eye00) + glm::vec3(0, i*0.0025f - 0.99875f, j*0.0025f - 0.99875f) - glm::vec3(eye00);
-			//currentPixel = eye + glm::vec3(0, i*(2.0f / 3.0f*SIZE) - (1 - (1 / 3.0f*SIZE)), j*(2.0f / 3.0f*SIZE) - (1 - (1 / 3.0f*SIZE))) - glm::vec3(eye);
+			pixelColor = glm::vec3(0.0f, 0.0f, 0.0f);
 
-			//ray = Ray(eye, glm::vec4(currentPixel, 1));
-
-			//Follow the ray and store the first intersection
 			Intersection* root = new Intersection;
 			root->R = nullptr;
 			root->T = nullptr;
-			glm::vec3 pixelColor = glm::vec3(0.0f,0.0f,0.0f);
 
-			//Subrays
-			currentSubPixel.y -= (2.0f / 4.0f*SIZE) - (1 - (1 / 4.0f*SIZE));
-			currentSubPixel.z -= (2.0f / 4.0f*SIZE) - (1 - (1 / 4.0f*SIZE));
-			ray = Ray(eye, glm::vec4(currentPixel, 1));
-			subPixelColor += scene.getIntersection(ray, root);
-			subPixelColor *= root->radiance;
-			pixelColor += subPixelColor;
-			currentSubPixel = currentPixel;
+			//Single ray
+			//ray = Ray(eye, glm::vec4(currentPixel, 1));
+			//pixelColor += scene.getIntersection(ray, root);
 
-			currentSubPixel.y -= (2.0f / 4.0f*SIZE) - (1 - (1 / 4.0f*SIZE));
-			currentSubPixel.z += (2.0f / 4.0f*SIZE) - (1 - (1 / 4.0f*SIZE));
-			ray = Ray(eye, glm::vec4(currentPixel, 1));
-			subPixelColor += scene.getIntersection(ray, root);
-			subPixelColor *= root->radiance;
-			pixelColor += subPixelColor;
-			currentSubPixel = currentPixel;
-
-			currentSubPixel.y += (2.0f / 4.0f*SIZE) - (1 - (1 / 4.0f*SIZE));
-			currentSubPixel.z -= (2.0f / 4.0f*SIZE) - (1 - (1 / 4.0f*SIZE));
-			ray = Ray(eye, glm::vec4(currentPixel, 1));
-			subPixelColor += scene.getIntersection(ray, root);
-			subPixelColor *= root->radiance;
-			pixelColor += subPixelColor;
-			currentSubPixel = currentPixel;
-
-			currentSubPixel.y += (2.0f / SIZE) - (1 - (1 / SIZE));
-			currentSubPixel.z += (2.0f / SIZE) - (1 - (1 / SIZE));
-			subPixelColor += scene.getIntersection(ray, root);
-			subPixelColor *= root->radiance;
-			pixelColor += subPixelColor;
-			currentSubPixel = currentPixel;
-
-			pixelColor = pixelColor / 4.0f;
-
-			//currentPixel = eye + glm::vec3(0, a*(2.0f / 3.0f*SIZE) - (1 - (1 / 3.0f*SIZE)), b*(2.0f / 3.0f*SIZE) - (1 - (1 / 3.0f*SIZE))) - glm::vec3(eye);
-
-			/*for (int a = -1; a < 2; a++) {
-				for (int b = -1; b < 2; b++) {
-					currentPixel.y += a * (2.0f / 4.0f*SIZE) - (1 - (1 / 4.0f*SIZE));
-					currentPixel.z += b * (2.0f / 4.0f*SIZE) - (1 - (1 / 4.0f*SIZE));
-					
+			//Multi rays SUB_SIZE = 4 (4x4)
+			//Dont forget to change SUB_SIZE
+			currentPixel.y -= 3 / (8 * SIZE);
+			currentPixel.z -= 3 / (8 * SIZE);
+			for (int a = 0; a < SUB_SIZE; a++) {
+				for (int b = 0; b < SUB_SIZE; b++) {
+					currentPixel.y += 1 / (4 * SIZE)*a;
+					currentPixel.z += 1 / (4 * SIZE)*b;
+					ray = Ray(eye, glm::vec4(currentPixel, 1));
+					pixelColor += scene.getIntersection(ray, root);
 				}
-			}*/
+			}
+			pixelColor /= SUB_SIZE * SUB_SIZE;
+
+			//Give light source color
+			if (root->point.x >= 4 && root->point.x <= 6)
+				if (root->point.y >= -1 && root->point.y <= 1)
+					if (root->point.z > 4.9f)
+						pixelColor = glm::vec3(1, 1, 1);
+
+
+			/*//Multi rays SUB_SIZE = 2 (2x2)
+			//Dont forget to change SUB_SIZE
+			currentPixel.y -= 1 / (4 * SIZE);
+			currentPixel.z -= 1 / (4 * SIZE);
+			for (int a = 0; a < SUB_SIZE; a++) {
+				for (int b = 0; b < SUB_SIZE; b++) {
+					currentPixel.y += 1 / (2 * SIZE)*a;
+					currentPixel.z += 1 / (2 * SIZE)*b;
+					ray = Ray(eye, glm::vec4(currentPixel, 1));
+					pixelColor += scene.getIntersection(ray, root);
+				}
+			}
+			pixelColor /= SUB_SIZE * SUB_SIZE;*/
 			
 
 			//Store the highest color value

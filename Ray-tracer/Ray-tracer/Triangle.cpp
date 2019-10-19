@@ -75,7 +75,7 @@ bool Triangle::rayIntersection(Ray ray, glm::vec3 &intersection) {
 	float xx = ((float)rand() / RAND_MAX) * (6 - 4) + 4;
 	float yy = ((float)rand() / RAND_MAX) * (1 + 1) - 1;
 
-	Ray shadowRay = Ray(currentHit, glm::vec3(xx, yy, 4.0f));
+	Ray shadowRay = Ray(currentHit, glm::vec3(xx, yy, 4.95f));
 	float shadowAngle = glm::dot(shadowRay.getDirection(), this->getNormal()) / (glm::length(shadowRay.getDirection())*glm::length(this->getNormal()));
 	this->brightness = shadowAngle;
 
