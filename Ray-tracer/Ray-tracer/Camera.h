@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <omp.h>
 
 #include "glm/glm.hpp"
 #include "Pixel.h"

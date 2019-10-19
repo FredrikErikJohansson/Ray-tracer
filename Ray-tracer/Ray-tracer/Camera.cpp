@@ -36,6 +36,9 @@ void Camera::render(Scene scene) {
 	if (eyeSwitch) eye = eye01;
 	else eye = eye00;
 
+	double start, end, runTime;
+	start = omp_get_wtime();
+
 	//Intersection isec;
 	float pixelBrightness;
 	glm::vec3 pixelColor = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -46,6 +49,7 @@ void Camera::render(Scene scene) {
 
 	for (register size_t i = 0; i < SIZE; i++) {
 		if ( i % 10 == 0 ) std::cout << i + 1 << "/" << SIZE << std::endl;
+		#pragma omp parallel for
 		for (register size_t j = 0; j < SIZE; j++) {
 
 			//Camera position
@@ -119,6 +123,9 @@ void Camera::render(Scene scene) {
 	}
 
 	delete iTree;
+	end = omp_get_wtime();
+	runTime = end - start;
+	std::cout << "Elapsed time: " << runTime << " seconds." << std::endl;
 	
 	//Map the color values from the max values
 	glm::vec3 currentColor;

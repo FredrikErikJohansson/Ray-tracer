@@ -259,7 +259,7 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) const {
 	float yy;
 	float D = 0.1f;
 
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 8; i++) {
 		xx = ((float)rand() / RAND_MAX) * (6 - 4) + 4;
 		yy = ((float)rand() / RAND_MAX) * (1 + 1) - 1;
 
@@ -267,8 +267,6 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) const {
 
 		if (!this->isVisible(shadowRay)) D *= 0.0f;
 	}
-	
-
 	
 	//Refers to "commented"
 	//Adds radiance from lightsource at Intersections (D*(the angle of the normal from the lightsource))
@@ -355,8 +353,7 @@ bool Scene::isVisible(Ray ray) const {
 		}
 	}
 
-	if (minDistance < distance)
-		return false;
+	if (minDistance < distance)	return false;
 	
 	return true;
 }
