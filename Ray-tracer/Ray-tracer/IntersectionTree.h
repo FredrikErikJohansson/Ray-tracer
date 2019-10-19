@@ -12,8 +12,6 @@ struct Intersection {
 	Sphere sphere;
 	glm::vec3 point = glm::vec3(999.9f, 999.9f, 999.9f);
 	std::string closest = "";
-	int triHits = 0;
-	int sphHits = 0;
 
 	Intersection *R;
 	Intersection *T;
@@ -27,8 +25,6 @@ public:
 	~IntersectionTree();
 
 private:
-	
-
 	void destroy_tree(Intersection *leaf);
 	Intersection* root;
 };

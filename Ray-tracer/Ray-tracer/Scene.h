@@ -10,17 +10,6 @@
 #include "Tetrahedron.h"
 #include "IntersectionTree.h"
 
-//TODO: Make this a Binary tree called intersection
-/*struct Intersection {
-	Triangle triangle;
-	Sphere sphere;
-	glm::vec3 point = glm::vec3(999.9f, 999.9f, 999.9f);
-	std::string close = "";
-	int tri_hits = 0;
-	int sph_hits = 0;
-};*/
-
-
 class Scene
 {
 public:
@@ -30,6 +19,7 @@ public:
 	bool isVisible(Ray shadowRay) const;
 
 	void createScene();
+
 	glm::vec3 getIntersection(Ray ray, Intersection* root) const;
 	Ray getReflection(Ray ray, Intersection* leaf) const;
 	Ray getRefraction(Ray ray, Intersection* leaf) const;

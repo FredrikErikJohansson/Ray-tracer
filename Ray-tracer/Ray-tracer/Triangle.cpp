@@ -81,6 +81,7 @@ bool Triangle::rayIntersection(Ray ray, glm::vec3 &intersection) {
 
 	t = glm::dot(Q, edge02) / glm::dot(P, edge01);
 
+	//Check with distance if we got a hit
 	if (t < FLT_EPSILON || t > 1000.0f) return false;
 
 	intersection = rayStart + direction * t;

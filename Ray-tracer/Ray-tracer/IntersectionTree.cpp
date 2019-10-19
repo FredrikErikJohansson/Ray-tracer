@@ -13,9 +13,8 @@ IntersectionTree::~IntersectionTree()
 	destroy_tree(root);
 }
 
-
 void IntersectionTree::destroy_tree(Intersection *leaf) {
-	if (leaf != NULL) {
+	if (leaf != nullptr) {
 		destroy_tree(leaf->R);
 		destroy_tree(leaf->T);
 		delete leaf;

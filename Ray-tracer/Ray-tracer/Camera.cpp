@@ -64,6 +64,7 @@ void Camera::render(Scene scene) {
 
 			//Multi rays SUB_SIZE = 4 (4x4)
 			//Dont forget to change SUB_SIZE
+			//TODO: Add anti-aliasing
 			currentPixel.y -= 3 / (8 * SIZE);
 			currentPixel.z -= 3 / (8 * SIZE);
 			for (int a = 0; a < SUB_SIZE; a++) {

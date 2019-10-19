@@ -144,18 +144,20 @@ void Scene::createScene() {
 	spheres[2].setCenter(glm::vec3(5, -3, -3));
 	spheres[2].setRadius(1.0f);
 	spheres[2].setColor(glm::vec3(0, 1, 0));
-	//spheres[2].setMaterial(pureTransp);
+	spheres[2].setMaterial(pureReflect);
 
 	//DEBUGGING MIRROR
-	for (int i = 14; i <= 15; i++)
+	/*for (int i = 14; i <= 15; i++)
 	{
 		triangles[i].setMaterial(pureReflect);
-	}
+	}*/
 }
 
 glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) const {
 
 	float reflectCof = 1.0f;
+	float D = 0.0f;
+	int const numberOfShadowRays = 20;
 
 	glm::vec3 color = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 intersection;
@@ -185,6 +187,7 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) const {
 	if (ray.getdepth() < 6) {
 		if (root->closest == "TRIANGLE") {
 			if (root->triangle.getMaterial().getType() == "MIRROR") {
+
 				root->R = new Intersection();
 				root->R->Parent = root;
 				root->R->R = nullptr;
@@ -195,6 +198,7 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) const {
 				color = this->getIntersection(this->getReflection(ray, root), root->R)*reflectCof;
 			}
 			else if (root->triangle.getMaterial().getType() == "TRANSPARENT") {
+
 				root->R = new Intersection();
 				root->R->Parent = root;
 				root->R->R = nullptr;
@@ -214,6 +218,7 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) const {
 		}
 		else if (root->closest == "SPHERE") {
 			if (root->sphere.getMaterial().getType() == "MIRROR") {
+
 				root->R = new Intersection();
 				root->R->Parent = root;
 				root->R->R = nullptr;
@@ -224,6 +229,7 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) const {
 				color = this->getIntersection(this->getReflection(ray, root), root->R)*reflectCof;
 			}
 			else if (root->sphere.getMaterial().getType() == "TRANSPARENT") {
+
 				root->R = new Intersection();
 				root->R->Parent = root;
 				root->R->R = nullptr;
@@ -253,26 +259,26 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) const {
 	else if (root->T != nullptr)
 		root->radiance += (root->T->radiance*root->T->importance) / root->importance;
 
-	//Check if the intersection is visible
-	//TODO: Add area lightsource
 	float xx;
 	float yy;
-	float D = 0.0f;
-	int const numberOfShadowRays = 10;
-
-	for (int i = 0; i < numberOfShadowRays; i++) {
-		xx = ((float)rand() / RAND_MAX) * (6 - 4) + 4;
-		yy = ((float)rand() / RAND_MAX) * (1 + 1) - 1;
-
-		Ray shadowRay = Ray(root->point, glm::vec3(xx, yy, 4.95f));
-
-		if (!this->isVisible(shadowRay)) continue;
-
-		D += 1.0f/ numberOfShadowRays;
-	}
-
 	//Diffuse hit
+	//TODO: Monte Carlo
+	//Make lamertian reflector - lecture 11
+	//Russian roulette - lecture 11
 	if (root->R == nullptr && root->T == nullptr) {
+
+		//Check if the intersection is visible with multiple shadowrays
+		for (int i = 0; i < numberOfShadowRays; i++) {
+			xx = ((float)rand() / RAND_MAX) * (6 - 4) + 4;
+			yy = ((float)rand() / RAND_MAX) * (1 + 1) - 1;
+
+			Ray shadowRay = Ray(root->point, glm::vec3(xx, yy, 4.95f));
+
+			if (!this->isVisible(shadowRay)) continue;
+
+			D += 1.0f / numberOfShadowRays;
+		}
+
 		if (root->closest == "TRIANGLE") {
 			root->radiance = root->triangle.getBrightness()*D;
 			color = root->triangle.getColor()*root->radiance;
@@ -283,9 +289,7 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) const {
 		}
 	}
 	
-	//Refers to "commented"
-	//Adds radiance from lightsource at Intersections (D*(the angle of the normal from the lightsource))
-	//Only intersections which are transparent
+	//Adds radiance from lightsource at Intersections
 	/*if (root->closest == "TRIANGLE" && root->triangle.getMaterial().getType() == "TRANSPARENT") {
 		root->radiance += root->triangle.getBrightness()*D;
 	}
