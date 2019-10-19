@@ -2,6 +2,13 @@
 
 #include <string>
 
+//TODO: Change to BRDF
+//Lambertian as standard
+//Pure reflective
+//Transparent - for grade 4
+//Oren-nayar - for grade 4
+//Maybe add lightsource as a BRDF
+
 class Material
 {
 public:
