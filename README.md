@@ -2,7 +2,7 @@
 A whitted ray tracer created in the course TNCG15 - Advanced Global Illumination and Rendering at Linköpings University.
 
 ### Getting started:
-Run the following commands
+Run the following command
 ```
 git clone https://github.com/FredrikErikJohansson/Ray-tracer.git
 ```
