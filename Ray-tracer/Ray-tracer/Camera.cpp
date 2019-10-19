@@ -42,10 +42,10 @@ void Camera::render(Scene scene) {
 
 	IntersectionTree * iTree = new IntersectionTree();
 
-	for (register size_t i = 0; i < SIZE; i++) {
+	for (int i = 0; i < SIZE; i++) {
 		if ( i % 10 == 0 ) std::cout << i + 1 << "/" << SIZE << std::endl;
 		#pragma omp parallel for
-		for (register size_t j = 0; j < SIZE; j++) {
+		for (int j = 0; j < SIZE; j++) {
 
 			//Camera position
 			currentPixel = eye + glm::vec3(0, i*(2.0f / SIZE) - (1 - (1 / SIZE)), j*(2.0f / SIZE) - (1 - (1 / SIZE))) - glm::vec3(eye);
