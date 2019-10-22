@@ -33,7 +33,7 @@ private:
 	int sceneTriangles = 24;
 
 	Tetrahedron tetrahedron;
-	Triangle triangles[28];
+	Triangle triangles[30];
 
 	Sphere spheres[3];
 };

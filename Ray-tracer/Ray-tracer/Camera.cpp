@@ -60,7 +60,7 @@ void Camera::render(Scene scene) {
 			//Multi rays SUB_SIZE = 4 (4x4)
 			//Dont forget to change SUB_SIZE
 			//TODO: Add anti-aliasing
-			currentPixel.y -= 3 / (8 * SIZE);
+			/*currentPixel.y -= 3 / (8 * SIZE);
 			currentPixel.z -= 3 / (8 * SIZE);
 			for (int a = 0; a < SUB_SIZE; a++) {
 				for (int b = 0; b < SUB_SIZE; b++) {
@@ -70,9 +70,9 @@ void Camera::render(Scene scene) {
 					pixelColor += scene.getIntersection(ray, root);
 				}
 			}
-			pixelColor /= SUB_SIZE * SUB_SIZE;
+			pixelColor /= SUB_SIZE * SUB_SIZE;*/
 
-			/*//Multi rays SUB_SIZE = 2 (2x2)
+			//Multi rays SUB_SIZE = 2 (2x2)
 			//Dont forget to change SUB_SIZE
 			currentPixel.y -= 1 / (4 * SIZE);
 			currentPixel.z -= 1 / (4 * SIZE);
@@ -84,13 +84,13 @@ void Camera::render(Scene scene) {
 					pixelColor += scene.getIntersection(ray, root);
 				}
 			}
-			pixelColor /= SUB_SIZE * SUB_SIZE;*/
+			pixelColor /= SUB_SIZE * SUB_SIZE;
 			
 			//Give light source color
-			if (root->point.x >= 4 && root->point.x <= 6)
+			/*if (root->point.x >= 4 && root->point.x <= 6)
 				if (root->point.y >= -1 && root->point.y <= 1)
 					if (root->point.z > 4.9f)
-						pixelColor = glm::vec3(1, 1, 1);
+						pixelColor = glm::vec3(1, 1, 1);*/
 
 			//Store the highest color value
 			if (glm::max(glm::max(pixelColor.x, pixelColor.y), pixelColor.z) > maxVal)

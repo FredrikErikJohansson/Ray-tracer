@@ -20,6 +20,7 @@ public:
 	glm::vec3 getColor();
 	glm::vec3 getCenter();
 	Material getMaterial();
+	glm::vec3 getNormal(glm::vec3 point);
 
 	void setColor(glm::vec3 _color);
 	void setCenter(glm::vec3 _center);

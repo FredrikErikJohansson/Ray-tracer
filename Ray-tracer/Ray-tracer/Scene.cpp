@@ -77,8 +77,8 @@ void Scene::createScene() {
 	triangles[13].setColor(glm::vec3(0.1f, 0.95f, 0.3f));
 	triangles[14].setColor(glm::vec3(0.3f, 0.95f, 0.1f));
 	triangles[15].setColor(glm::vec3(0.3f, 0.95f, 0.1f));
-	triangles[16].setColor(glm::vec3(1.0f, 0.5f, 0.0f));
-	triangles[17].setColor(glm::vec3(1.0f, 0.5f, 0.0f));
+	triangles[16].setColor(glm::vec3(1.0f, 0.5f, 1.0f));
+	triangles[17].setColor(glm::vec3(1.0f, 0.5f, 1.0f));
 
 	//Walls normals (right)
 	triangles[12].setNormal(glm::vec3(-2 / sqrt(5), 1 / sqrt(5), 0));
@@ -112,6 +112,21 @@ void Scene::createScene() {
 	triangles[22].setNormal(glm::vec3(0, 0, -1));
 	triangles[23].setNormal(glm::vec3(0, 0, -1));
 
+	//Give light source color
+	//if (root->point.x >= 4 && root->point.x <= 6)
+	//if (root->point.y >= -1 && root->point.y <= 1)
+	//if (root->point.z > 4.9f)
+
+	//Light vertices
+	/*triangles[28].setVertices(glm::vec4(4, 1, 4.5f, 1), glm::vec4(6, 1, 4.5f, 1), glm::vec4(6, -1, 4.5f, 1));
+	triangles[29].setVertices(glm::vec4(6, -1, 4.5f, 1), glm::vec4(4, -1, 4.5f, 1), glm::vec4(4, 1, 4.5f, 1));
+	//Light normals
+	triangles[28].setNormal(glm::vec3(0, 0, -1));
+	triangles[29].setNormal(glm::vec3(0, 0, -1));
+	//Light color
+	triangles[28].setColor(glm::vec3(1, 1, 1));
+	triangles[29].setColor(glm::vec3(1, 1, 1));*/
+
 	//Get the triangles of the tetrahedron
 	for (int i = 0; i < tetrahedronTriangleAmount; i++) {
 		triangles[sceneTriangles + i] = tetrahedron.getTetrahedronTriangles(i);
@@ -125,21 +140,28 @@ void Scene::createScene() {
 	Material pureReflect;
 	pureReflect.setType("MIRROR");
 
+	Material lambertian;
+	lambertian.setType("LAMBERTIAN");
+
 	triangles[24].setMaterial(pureReflect);
 	triangles[25].setMaterial(pureReflect);
 	triangles[26].setMaterial(pureReflect);
 	triangles[27].setMaterial(pureReflect);
 
+	//Light
+	//triangles[28].setMaterial(light);
+	//triangles[29].setMaterial(light);
+
 	//Spheres
 	spheres[0].setCenter(glm::vec3(5, 3, -1));
 	spheres[0].setRadius(1.0f);
 	spheres[0].setColor(glm::vec3(1, 0, 0));
-	//spheres[0].setMaterial(pureTransp);
+	spheres[0].setMaterial(lambertian);
 
 	spheres[1].setCenter(glm::vec3(10, 0, 0));
 	spheres[1].setRadius(1.0f);
 	spheres[1].setColor(glm::vec3(1, 1, 0));
-	//spheres[1].setMaterial(pureTransp);
+	spheres[1].setMaterial(lambertian);
 
 	spheres[2].setCenter(glm::vec3(5, -3, -3));
 	spheres[2].setRadius(1.0f);
@@ -156,8 +178,8 @@ void Scene::createScene() {
 glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) const {
 
 	float reflectCof = 1.0f;
-	float D = 0.0f;
-	int const numberOfShadowRays = 20;
+	float LD = 0.0f;
+	int const numberOfShadowRays = 10;
 
 	glm::vec3 color = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 intersection;
@@ -184,7 +206,7 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) const {
 		}
 	}
 
-	if (ray.getdepth() < 6) {
+	if (ray.getdepth() < 4) {
 		if (root->closest == "TRIANGLE") {
 			if (root->triangle.getMaterial().getType() == "MIRROR") {
 
@@ -246,10 +268,52 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) const {
 				root->T->importance = root->importance*(1.0f - reflectCof);
 				color = this->getIntersection(this->getReflection(ray, root), root->R)*reflectCof + this->getIntersection(this->getRefraction(ray, root), root->T)*(1.0f- reflectCof);
 			}
+		
 		}
 	}
 
 	ray--;
+
+	float xx;
+	float yy;
+	//Diffuse hit
+	//TODO: Monte Carlo
+	//Make lamertian reflector - lecture 11
+	//Russian roulette - lecture 11
+	float Vk = 1.0f;
+	float A = 4.0f;
+	if (root->R == nullptr && root->T == nullptr) {
+
+		//Check if the intersection is visible with multiple shadowrays
+		for (int i = 0; i < numberOfShadowRays; i++) {
+			xx = ((float)rand() / RAND_MAX) * (6 - 4) + 4;
+			yy = ((float)rand() / RAND_MAX) * (1 + 1) - 1;
+
+			Ray shadowRay = Ray(root->point, glm::vec3(xx, yy, 4.99f));
+
+			if (!this->isVisible(shadowRay)) Vk = 0.0f;
+			else Vk = 1.0f;
+
+			if (root->closest == "TRIANGLE") {
+				float shadowAngle = glm::dot(shadowRay.getDirection(), root->triangle.getNormal()) / (glm::length(shadowRay.getDirection())*glm::length(root->triangle.getNormal()));
+				LD += (((glm::dot(-shadowRay.getDirection(), glm::vec3(0, 0, -1))*glm::dot(shadowRay.getDirection(), root->triangle.getNormal())) / pow(shadowRay.getLength(), 2.0f)))*(Vk*shadowAngle);
+			}
+			else if (root->closest == "SPHERE") {
+				float shadowAngle = glm::dot(shadowRay.getDirection(), root->sphere.getNormal(root->point));
+				LD += (((glm::dot(-shadowRay.getDirection(), glm::vec3(0, 0, -1))*glm::dot(shadowRay.getDirection(), root->sphere.getNormal(root->point))) / pow(shadowRay.getLength(), 2.0f)))*(Vk*shadowAngle);
+			}
+		}
+
+		if (root->closest == "TRIANGLE") {
+			root->radiance = (LD*A) / numberOfShadowRays;
+			color = root->triangle.getColor()*root->radiance;
+			
+		}
+		else if (root->closest == "SPHERE") {
+			root->radiance = (LD*A) / numberOfShadowRays;
+			color = root->sphere.getColor()*root->radiance;
+		}
+	}
 
 	//Calculates the radiance of the root using Li=(Wr*Lr+Wt*Lt)/Wi
 	if (root->R != nullptr && root->T != nullptr)
@@ -258,43 +322,16 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) const {
 		root->radiance += (root->R->radiance*root->R->importance) / root->importance;
 	else if (root->T != nullptr)
 		root->radiance += (root->T->radiance*root->T->importance) / root->importance;
-
-	float xx;
-	float yy;
-	//Diffuse hit
-	//TODO: Monte Carlo
-	//Make lamertian reflector - lecture 11
-	//Russian roulette - lecture 11
-	if (root->R == nullptr && root->T == nullptr) {
-
-		//Check if the intersection is visible with multiple shadowrays
-		for (int i = 0; i < numberOfShadowRays; i++) {
-			xx = ((float)rand() / RAND_MAX) * (6 - 4) + 4;
-			yy = ((float)rand() / RAND_MAX) * (1 + 1) - 1;
-
-			Ray shadowRay = Ray(root->point, glm::vec3(xx, yy, 4.95f));
-
-			if (!this->isVisible(shadowRay)) continue;
-
-			D += 1.0f / numberOfShadowRays;
-		}
-
-		if (root->closest == "TRIANGLE") {
-			root->radiance = root->triangle.getBrightness()*D;
-			color = root->triangle.getColor()*root->radiance;
-		}
-		else if (root->closest == "SPHERE") {
-			root->radiance = root->sphere.getBrightness()*D;
-			color = root->sphere.getColor()*root->radiance;
-		}
-	}
+	
 	
 	//Adds radiance from lightsource at Intersections
-	/*if (root->closest == "TRIANGLE" && root->triangle.getMaterial().getType() == "TRANSPARENT") {
-		root->radiance += root->triangle.getBrightness()*D;
+	/*if (root->closest == "TRIANGLE") {
+		//root->radiance += root->triangle.getBrightness();
+		color = root->triangle.getColor()*root->radiance;
 	}
-	else if (root->closest == "SPHERE" && root->sphere.getMaterial().getType() == "TRANSPARENT") {
-		root->radiance += root->sphere.getBrightness()*D;
+	else if (root->closest == "SPHERE") {
+		//root->radiance += root->sphere.getBrightness();
+		color = root->sphere.getColor()*root->radiance;
 	}*/
 
 	
@@ -309,7 +346,7 @@ Ray Scene::getReflection(Ray ray, Intersection* leaf) const {
 	else if (leaf->closest == "SPHERE") N = glm::normalize(leaf->point - leaf->sphere.getCenter());
 	glm::vec3 R = glm::normalize(L - 2.0f*glm::dot(N, L)*N)*100.0f;
 
-	return Ray(leaf->point + N * 0.001f, R);
+	return Ray(leaf->point + N * 0.1f, R);
 }
 
 Ray Scene::getRefraction(Ray ray, Intersection* leaf) const {
@@ -342,12 +379,16 @@ bool Scene::isVisible(Ray ray) const {
 	glm::vec3 intersection;
 	float distance = ray.getLength();
 	float minDistance = 1000.0f;
+	std::string type;
+	float zVal = 0.0f;
 
 	for (Triangle triangle : triangles) {
 		if (triangle.getMaterial().getType() == "TRANSPARENT") continue;
 		if (triangle.rayIntersection(ray, intersection)) {
 			if (glm::length(intersection - glm::vec3(ray.getStartPoint())) < minDistance) {
 				minDistance = glm::length(intersection - glm::vec3(ray.getStartPoint()));
+				type = triangle.getMaterial().getType();
+				zVal = intersection.z;
 			}
 		}
 	}
@@ -357,11 +398,14 @@ bool Scene::isVisible(Ray ray) const {
 		if (sphere.rayIntersection(ray, intersection)) {
 			if (glm::length(intersection - glm::vec3(ray.getStartPoint())) < minDistance) {
 				minDistance = glm::length(intersection - glm::vec3(ray.getStartPoint()));
+				type = sphere.getMaterial().getType();
+				zVal = intersection.z;
 			}
 		}
 	}
 
-	if (minDistance < distance)	return false;
+	//if (zVal > 4.9f) return true;
+	if (minDistance < distance && type != "LIGHT" ) return false;
 	
 	return true;
 }

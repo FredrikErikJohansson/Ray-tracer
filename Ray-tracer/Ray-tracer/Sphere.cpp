@@ -27,6 +27,10 @@ Material Sphere::getMaterial() {
 	return material;
 }
 
+glm::vec3 Sphere::getNormal(glm::vec3 point) {
+	return glm::normalize(point - this->center);
+}
+
 
 void Sphere::setColor(glm::vec3 _color) {
 	color = _color;
@@ -77,12 +81,12 @@ bool Sphere::rayIntersection(Ray ray, glm::vec3 &intersection) {
 	float xx = ((float)rand() / RAND_MAX) * (6 - 4) + 4;
 	float yy = ((float)rand() / RAND_MAX) * (1 + 1) - 1;
 
-	Ray shadowRay = Ray(intersection, glm::vec3(xx, yy, 4.95f));
-	float shadowAngle = glm::dot(shadowRay.getDirection(), normal);
+	//Ray shadowRay = Ray(intersection, glm::vec3(xx, yy, 5));
+	//float shadowAngle = glm::dot(shadowRay.getDirection(), normal);
 
 	//May not be needed
-	if (shadowAngle < 0) this->brightness = 0.0f;
-	else this->brightness = shadowAngle;
+	//if (shadowAngle < 0) this->brightness = 0.0f;
+	//else this->brightness = shadowAngle;
 	//this->brightness = shadowAngle;
 
 	return true;
