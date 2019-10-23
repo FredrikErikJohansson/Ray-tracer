@@ -1,14 +1,20 @@
 #pragma once
 
-#include <cmath>
+#include <math.h>
 #include <iostream>
 #include <list>
+#include <random>
+
 
 #include "Triangle.h"
 #include "Sphere.h"
 #include "Ray.h"
 #include "Tetrahedron.h"
 #include "IntersectionTree.h"
+#include "glm/gtx/rotate_vector.hpp"
+
+static std::default_random_engine GENERATOR;
+static std::uniform_real_distribution<double> DISTR(0.0, 1.0);
 
 class Scene
 {
@@ -16,21 +22,26 @@ public:
 	Scene();
 	~Scene();
 
-	bool isVisible(Ray shadowRay) const;
+	bool isVisible(Ray ray) const;
 
 	void createScene();
+	double uniformRand();
+	double randMinMax(const double &min, const double &max);
 
-	glm::vec3 getIntersection(Ray ray, Intersection* root) const;
-	Ray getReflection(Ray ray, Intersection* leaf) const;
-	Ray getRefraction(Ray ray, Intersection* leaf) const;
+	glm::vec3 calculateDirectLight(Intersection* root);
+
+	Ray getRandomRay(Ray ray, Intersection* leaf);
+	glm::vec3 getIntersection(Ray ray, Intersection* root);
+	Ray getReflection(Ray ray, Intersection* leaf);
+	Ray getRefraction(Ray ray, Intersection* leaf);
 
 private:
 
 	//The room is 24 triangles
 	//Tetrahedron is 4 triangles
-	int triangleAmount = 28;
+	int triangleAmount = 30;
 	int tetrahedronTriangleAmount = 4;
-	int sceneTriangles = 24;
+	int sceneTriangles = 26;
 
 	Tetrahedron tetrahedron;
 	Triangle triangles[30];

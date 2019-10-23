@@ -12,10 +12,10 @@ void Tetrahedron::createTetrahedron() {
 	tetrahedronTriangles[3].setVertices(v0, v1, v2);
 
 	//Set the color of the tetrahedron.
-	tetrahedronTriangles[0].setColor(glm::vec3(1, 1, 1));
-	tetrahedronTriangles[1].setColor(glm::vec3(1, 1, 1));
-	tetrahedronTriangles[2].setColor(glm::vec3(1, 1, 1));
-	tetrahedronTriangles[3].setColor(glm::vec3(1, 1, 1));
+	tetrahedronTriangles[0].setColor(glm::vec3(0, 1, 0.3));
+	tetrahedronTriangles[1].setColor(glm::vec3(0, 1, 0.3));
+	tetrahedronTriangles[2].setColor(glm::vec3(0, 1, 0.3));
+	tetrahedronTriangles[3].setColor(glm::vec3(0, 1, 0.3));
 
 	//Calculate the normal vectors of the triangles of the tetrahedron.
 	calcNormals();
@@ -35,7 +35,7 @@ Triangle Tetrahedron::getTetrahedronTriangles(int ind) {
 //Default constructor
 Tetrahedron::Tetrahedron()
 {
-	v0 = glm::vec4(7.0f, 0.0f, -2.0f, 1.0f);
+	v0 = glm::vec4(7.0f, -2.0f, -3.5f, 1.0f);
 	sideLength = 3.0f;
 }
 
