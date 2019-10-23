@@ -164,7 +164,7 @@ void Scene::createScene() {
 	spheres[0].setCenter(glm::vec3(5, 3, -1));
 	spheres[0].setRadius(1.0f);
 	spheres[0].setColor(glm::vec3(1, 0, 0));
-	spheres[0].setMaterial(pureReflect);
+	spheres[0].setMaterial(lambertian);
 
 	spheres[1].setCenter(glm::vec3(10, 0, 0));
 	spheres[1].setRadius(1.0f);
@@ -220,10 +220,14 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) {
 
 	if (root->closest == "") return glm::vec3(0.0f);
 
+	/*if (root->closest == "SPHERE")
+		if (root->sphere.getMaterial().getType() == "LAMBERTIAN")
+			std::cout << root->sphere.getMaterial().getType() << std::endl;*/
+
 	if (ray.getdepth() < 20) {
 		if (root->closest == "TRIANGLE") {
 			if (root->triangle.getMaterial().getType() == "LIGHT") {
-				return glm::vec3(10, 10, 10);
+				return glm::vec3(5, 5, 5);
 			}
 			else if (root->triangle.getMaterial().getType() == "MIRROR") {
 
@@ -267,7 +271,7 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) {
 			else if (root->sphere.getMaterial().getType() == "LAMBERTIAN") {
 				float r = uniformRand();
 
-				if (r < 0.25f) {
+				if (r < 0.75f) {
 					root->R = new Intersection();
 					root->R->Parent = root;
 					root->R->R = nullptr;
@@ -277,7 +281,7 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) {
 
 					ray++;
 					//TODO: Terminate when hitting lightsource
-					reflectedLight = 0.5f*(this->getIntersection(getRandomRay(ray, root), root->R));
+					reflectedLight = 0.5f*(this->getIntersection(this->getRandomRay(ray, root), root->R));
 				}
 			}
 		}
@@ -289,12 +293,15 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) {
 	glm::vec3 directLight = glm::vec3(0.f);
 
 	indirectLight = reflectedLight;
-	if(root->closest == "TRIANGLE")
-		if(root->triangle.getMaterial().getType() != "MIRROR")
+	if (root->closest == "TRIANGLE") {
+		if (root->triangle.getMaterial().getType() != "MIRROR")
 			directLight = calculateDirectLight(root);
-	else if(root->closest == "SPHERE")
+	}
+	else if (root->closest == "SPHERE") {
 		if (root->sphere.getMaterial().getType() != "MIRROR")
 			directLight = calculateDirectLight(root);
+	}
+		
 
 	//?
 	//Calculates the radiance of the root using Li=(Wr*Lr+Wt*Lt)/Wi
@@ -343,7 +350,6 @@ glm::vec3 Scene::calculateDirectLight(Intersection* root) {
 		
 		Sk = q - root->point;
 		d = glm::length(Sk);
-
 		Ray shadowRay = Ray(root->point, q);
 
 		cosAlpha = glm::dot(-Sk, LightSourceNormal);
