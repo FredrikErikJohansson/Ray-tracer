@@ -51,7 +51,7 @@ void Sphere::setMaterial(Material _material) {
 bool Sphere::rayIntersection(Ray ray, glm::vec3 &intersection) {
 	glm::vec3 rayStart = ray.getStartPoint();
 	glm::vec3 direction = ray.getDirection();
-	float b, c, d1, d2, d, x;
+	float b, c, d1, d2, d, x = 0.0f;
 
 	b = glm::dot(2.0f*direction, (rayStart - this->center));
 	c = glm::dot((rayStart - this->center), (rayStart - this->center)) - pow(this->radius, 2.0f);

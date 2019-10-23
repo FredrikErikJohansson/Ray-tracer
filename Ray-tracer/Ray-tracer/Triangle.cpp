@@ -50,7 +50,7 @@ bool Triangle::rayIntersection(Ray ray, glm::vec3 &intersection) {
 	glm::vec3 rayStart = ray.getStartPoint();
 	glm::vec3 rayEnd = ray.getEndPoint();
 	glm::vec3 direction = glm::normalize(ray.getDirection());
-	float t, u, v;
+	float t, u, v = 0.0f;
 
 	glm::vec3 rayToVertex = rayStart - glm::vec3(v0);
 	glm::vec3 edge01 = glm::vec3(v1) - glm::vec3(v0);

@@ -10,11 +10,11 @@
 #include "Sphere.h"
 #include "Ray.h"
 #include "Tetrahedron.h"
-#include "IntersectionTree.h"
+#include "Intersection.h"
 #include "glm/gtx/rotate_vector.hpp"
 
 static std::default_random_engine GENERATOR;
-static std::uniform_real_distribution<double> DISTR(0.0, 1.0);
+static std::uniform_real_distribution<float> DISTR(0.0, 1.0);
 
 class Scene
 {
@@ -25,8 +25,8 @@ public:
 	bool isVisible(Ray ray) const;
 
 	void createScene();
-	double uniformRand();
-	double randMinMax(const double &min, const double &max);
+	float uniformRand();
+	float randMinMax(const float &min, const float &max);
 
 	glm::vec3 calculateDirectLight(Intersection* root);
 
@@ -46,6 +46,6 @@ private:
 	Tetrahedron tetrahedron;
 	Triangle triangles[30];
 
-	Sphere spheres[3];
+	Sphere spheres[2];
 };
 

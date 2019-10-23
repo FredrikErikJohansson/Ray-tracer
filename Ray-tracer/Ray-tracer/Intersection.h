@@ -3,11 +3,24 @@
 #include "Triangle.h"
 #include "Sphere.h"
 
-struct Intersection {
+class Intersection {
+public:
+	Intersection(Intersection* _parent) : Parent(_parent), R(nullptr), T(nullptr)
+	{
+	};
+
+	~Intersection();
+
+	void destroy() {
+		if (this) {
+			this->R->destroy();
+			this->T->destroy();
+			delete this;
+		}
+	}
 
 	float radiance = 0.0f;
 	float importance = 1.0f;
-	//glm::vec3 color = glm::vec3(0.0f, 0.0f, 0.0f);
 	Triangle triangle;
 	Sphere sphere;
 	glm::vec3 point = glm::vec3(999.9f, 999.9f, 999.9f);
@@ -17,15 +30,3 @@ struct Intersection {
 	Intersection *T;
 	Intersection *Parent;
 };
-
-class IntersectionTree
-{
-public:
-	IntersectionTree();
-	~IntersectionTree();
-
-private:
-	void destroy_tree(Intersection *leaf);
-	Intersection* root;
-};
-

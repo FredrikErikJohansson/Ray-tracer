@@ -31,11 +31,9 @@ void Camera::render(Scene scene) {
 	if (eyeSwitch) eye = eye01;
 	else eye = eye00;
 
+
 	double start, end, runTime;
 	start = omp_get_wtime();
-
-	IntersectionTree * iTree = new IntersectionTree();
-	
 	for (int i = 0; i < SIZE; i++) {
 		if ( i % 10 == 0 ) std::cout << i + 1 << "/" << SIZE << std::endl;
 		#pragma omp parallel for
@@ -44,18 +42,16 @@ void Camera::render(Scene scene) {
 			Ray ray;
 			glm::vec3 pixelColor = glm::vec3(0.0f);
 			glm::vec3 currentPixel = glm::vec3(0.0f);
-
+			
 			//Camera position
 			currentPixel = eye + glm::vec3(0, i*(2.0f / SIZE) - (1 - (1 / SIZE)), j*(2.0f / SIZE) - (1 - (1 / SIZE))) - glm::vec3(eye);
 
-			Intersection* root = new Intersection;
-			root->R = nullptr;
-			root->T = nullptr;
-
 			//Single ray
-			ray = Ray(eye, glm::vec4(currentPixel, 1));
-			pixelColor += scene.getIntersection(ray, root);
-
+			//Intersection* root = new Intersection(nullptr);
+			//ray = Ray(eye, glm::vec4(currentPixel, 1));
+			//pixelColor += scene.getIntersection(ray, root);
+			//root->destroy();
+			
 			//Multi rays SUB_SIZE = 8 (8x8)
 			//Dont forget to change SUB_SIZE
 			//TODO: Add anti-aliasing
@@ -63,10 +59,12 @@ void Camera::render(Scene scene) {
 			currentPixel.z -= 7 / (16 * SIZE);
 			for (int a = 0; a < SUB_SIZE; a++) {
 				for (int b = 0; b < SUB_SIZE; b++) {
+					Intersection* root = new Intersection(nullptr);
 					currentPixel.y += 1 / (8 * SIZE)*a;
 					currentPixel.z += 1 / (8 * SIZE)*b;
 					ray = Ray(eye, glm::vec4(currentPixel, 1));
 					pixelColor += scene.getIntersection(ray, root);
+					root->destroy();
 				}
 			}
 			pixelColor /= SUB_SIZE * SUB_SIZE;*/
@@ -78,13 +76,16 @@ void Camera::render(Scene scene) {
 			currentPixel.z -= 3 / (8 * SIZE);
 			for (int a = 0; a < SUB_SIZE; a++) {
 				for (int b = 0; b < SUB_SIZE; b++) {
+					Intersection* root = new Intersection(nullptr);
 					currentPixel.y += 1 / (4 * SIZE)*a;
 					currentPixel.z += 1 / (4 * SIZE)*b;
 					ray = Ray(eye, glm::vec4(currentPixel, 1));
 					pixelColor += scene.getIntersection(ray, root);
+					root->destroy();
 				}
 			}
 			pixelColor /= SUB_SIZE * SUB_SIZE;
+			
 
 			//Multi rays SUB_SIZE = 2 (2x2)
 			//Dont forget to change SUB_SIZE
@@ -92,10 +93,12 @@ void Camera::render(Scene scene) {
 			currentPixel.z -= 1 / (4 * SIZE);
 			for (int a = 0; a < SUB_SIZE; a++) {
 				for (int b = 0; b < SUB_SIZE; b++) {
+					Intersection* root = new Intersection(nullptr);
 					currentPixel.y += 1 / (2 * SIZE)*a;
 					currentPixel.z += 1 / (2 * SIZE)*b;
 					ray = Ray(eye, glm::vec4(currentPixel, 1));
 					pixelColor += scene.getIntersection(ray, root);
+					root->destroy();
 				}
 			}
 			pixelColor /= SUB_SIZE * SUB_SIZE;*/
@@ -111,10 +114,9 @@ void Camera::render(Scene scene) {
 				maxVal = glm::max(glm::max(pixelColor.x, pixelColor.y), pixelColor.z);
 
 			image[i][j].setColor(pixelColor.x, pixelColor.y, pixelColor.z);
-		}
-	}
 
-	delete iTree;
+		}	
+	}
 	end = omp_get_wtime();
 	runTime = end - start;
 	std::cout << "Elapsed time: " << runTime << " seconds." << std::endl;

@@ -14,11 +14,11 @@ Scene::~Scene()
 {
 }
 
-double Scene::uniformRand() {
+float Scene::uniformRand() {
 	return DISTR(GENERATOR);
 }
 
-double Scene::randMinMax(const double &min, const double &max) {
+float Scene::randMinMax(const float &min, const float &max) {
 	return min + uniformRand() * (max - min);
 }
 
@@ -231,10 +231,9 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) {
 			}
 			else if (root->triangle.getMaterial().getType() == "MIRROR") {
 
-				root->R = new Intersection();
-				root->R->Parent = root;
-				root->R->R = nullptr;
-				root->R->T = nullptr;
+				root->R = new Intersection(root);
+				//root->R->Parent = root;
+
 
 				ray++;
 				reflectCof = root->triangle.getMaterial().getReflectCof();
@@ -246,11 +245,8 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) {
 				Ray dummy = this->getRandomRay(ray, root);
 
 				if (glm::vec3(dummy.getStartPoint()) != glm::vec3(0.0f) && glm::vec3(dummy.getEndPoint()) != glm::vec3(0.0f)) {
-					root->R = new Intersection();
-					root->R->Parent = root;
-					root->R->R = nullptr;
-					root->R->T = nullptr;
-
+					root->R = new Intersection(root);
+					//root->R->Parent = root;
 					root->R->importance = root->importance;
 
 					//ray++;
@@ -261,12 +257,10 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) {
 		else if (root->closest == "SPHERE") {
 			if (root->sphere.getMaterial().getType() == "MIRROR") {
 
-				root->R = new Intersection();
-				root->R->Parent = root;
-				root->R->R = nullptr;
-				root->R->T = nullptr;
+				root->R = new Intersection(root);
+				//root->R->Parent = root;
 
-				ray++;
+
 				reflectCof = root->sphere.getMaterial().getReflectCof();
 				reflectedLight = this->getIntersection(this->getReflection(ray, root), root->R)*reflectCof;
 			}
@@ -276,21 +270,18 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) {
 				Ray dummy = this->getRandomRay(ray, root);
 
 				if (glm::vec3(dummy.getStartPoint()) != glm::vec3(0.0f) && glm::vec3(dummy.getEndPoint()) != glm::vec3(0.0f)) {
-					root->R = new Intersection();
-					root->R->Parent = root;
-					root->R->R = nullptr;
-					root->R->T = nullptr;
+					root->R = new Intersection(root);
+					//root->R->Parent = root;
+
 
 					root->R->importance = root->importance;
 
-					//ray++;
 					reflectedLight = 0.5f*(this->getIntersection(dummy, root->R));
 				}
 			}
 		}
 	}
 
-	ray--;
 
 	glm::vec3 indirectLight = glm::vec3(0.f);
 	glm::vec3 directLight = glm::vec3(0.f);
@@ -382,7 +373,7 @@ glm::vec3 Scene::calculateDirectLight(Intersection* root) {
 
 Ray Scene::getRandomRay(Ray ray, Intersection* root) {
 	float pi = 3.1415926535897f;
-	float rand1, rand2 = 0;
+	float rand1, rand2 = 0.0f;
 
 	glm::vec3 helper = glm::vec3(0.0f);
 	glm::vec3 tangent = glm::vec3(0.0f);
@@ -409,7 +400,7 @@ Ray Scene::getRandomRay(Ray ray, Intersection* root) {
 	float azimuth = 0.0f;
 	if(rand2 <= 0.75f)
 		azimuth = 2.0f * pi / (rand2);
-	else return  Ray(glm::vec3(0.0f), glm::vec3(0.0f));
+	else return  Ray(glm::vec3(0.0f), glm::vec3(0.0f)); //Use a bool instead
 
 	
 	random_direction = glm::normalize(glm::rotate(
@@ -439,9 +430,8 @@ Ray Scene::getRefraction(Ray ray, Intersection* leaf) {
 	//TODO: Add refraction when going from inside to outside of object
 	//T=(n1/n2)*L + N*(-(n1/n2)*dot(N,L)-sqrt(1-(n1/n2)^2*(1-dot(N,L)^2)))
 	glm::vec3 L = ray.getDirection();
-	glm::vec3 N;
-	glm::vec3 T;
-	float n;
+	glm::vec3 N, T = glm::vec3(0.0f);
+	float n = 0;
 
 	if (leaf->closest == "TRIANGLE") {
 		n = leaf->triangle.getMaterial().getN();
