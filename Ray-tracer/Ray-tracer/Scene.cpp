@@ -243,7 +243,9 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) {
 			else if (root->triangle.getMaterial().getType() == "LAMBERTIAN") {
 				float r = uniformRand();
 				
-				if (r < 0.25f) {
+				Ray dummy = this->getRandomRay(ray, root);
+
+				if (glm::vec3(dummy.getStartPoint()) != glm::vec3(0.0f) && glm::vec3(dummy.getEndPoint()) != glm::vec3(0.0f)) {
 					root->R = new Intersection();
 					root->R->Parent = root;
 					root->R->R = nullptr;
@@ -251,8 +253,8 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) {
 
 					root->R->importance = root->importance;
 
-					ray++;
-					reflectedLight = 0.5f*(this->getIntersection(this->getRandomRay(ray, root), root->R));
+					//ray++;
+					reflectedLight = 0.5f*(this->getIntersection(dummy, root->R));
 				}
 			}
 		}
@@ -271,7 +273,9 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) {
 			else if (root->sphere.getMaterial().getType() == "LAMBERTIAN") {
 				float r = uniformRand();
 
-				if (r < 0.75f) {
+				Ray dummy = this->getRandomRay(ray, root);
+
+				if (glm::vec3(dummy.getStartPoint()) != glm::vec3(0.0f) && glm::vec3(dummy.getEndPoint()) != glm::vec3(0.0f)) {
 					root->R = new Intersection();
 					root->R->Parent = root;
 					root->R->R = nullptr;
@@ -279,9 +283,8 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) {
 
 					root->R->importance = root->importance;
 
-					ray++;
-					//TODO: Terminate when hitting lightsource
-					reflectedLight = 0.5f*(this->getIntersection(this->getRandomRay(ray, root), root->R));
+					//ray++;
+					reflectedLight = 0.5f*(this->getIntersection(dummy, root->R));
 				}
 			}
 		}
@@ -403,7 +406,10 @@ Ray Scene::getRandomRay(Ray ray, Intersection* root) {
 	}
 
 	float inclination = asin(sqrt(rand1));
-	float azimuth = 2.0f * pi * (rand2);
+	float azimuth = 0.0f;
+	if(rand2 <= 0.75f)
+		azimuth = 2.0f * pi / (rand2);
+	else return  Ray(glm::vec3(0.0f), glm::vec3(0.0f));
 
 	
 	random_direction = glm::normalize(glm::rotate(

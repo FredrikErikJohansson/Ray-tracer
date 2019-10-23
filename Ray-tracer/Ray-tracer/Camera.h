@@ -12,7 +12,7 @@
 
 //SHOULD BE 800
 const int SIZE = 800;
-const int SUB_SIZE = 8;
+const int SUB_SIZE = 4;
 
 class Camera
 {

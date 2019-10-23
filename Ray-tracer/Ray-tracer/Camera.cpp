@@ -59,7 +59,7 @@ void Camera::render(Scene scene) {
 			//Multi rays SUB_SIZE = 8 (8x8)
 			//Dont forget to change SUB_SIZE
 			//TODO: Add anti-aliasing
-			currentPixel.y -= 7 / (16 * SIZE);
+			/*currentPixel.y -= 7 / (16 * SIZE);
 			currentPixel.z -= 7 / (16 * SIZE);
 			for (int a = 0; a < SUB_SIZE; a++) {
 				for (int b = 0; b < SUB_SIZE; b++) {
@@ -69,12 +69,12 @@ void Camera::render(Scene scene) {
 					pixelColor += scene.getIntersection(ray, root);
 				}
 			}
-			pixelColor /= SUB_SIZE * SUB_SIZE;
+			pixelColor /= SUB_SIZE * SUB_SIZE;*/
 
 			//Multi rays SUB_SIZE = 4 (4x4)
 			//Dont forget to change SUB_SIZE
 			//TODO: Add anti-aliasing
-			/*currentPixel.y -= 3 / (8 * SIZE);
+			currentPixel.y -= 3 / (8 * SIZE);
 			currentPixel.z -= 3 / (8 * SIZE);
 			for (int a = 0; a < SUB_SIZE; a++) {
 				for (int b = 0; b < SUB_SIZE; b++) {
@@ -84,7 +84,7 @@ void Camera::render(Scene scene) {
 					pixelColor += scene.getIntersection(ray, root);
 				}
 			}
-			pixelColor /= SUB_SIZE * SUB_SIZE;*/
+			pixelColor /= SUB_SIZE * SUB_SIZE;
 
 			//Multi rays SUB_SIZE = 2 (2x2)
 			//Dont forget to change SUB_SIZE
