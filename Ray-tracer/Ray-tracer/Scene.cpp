@@ -57,12 +57,12 @@ void Scene::createScene() {
 	triangles[11].setVertices(glm::vec4(13, 0, -5, 1), glm::vec4(10, 6, 5, 1), glm::vec4(13, 0, 5, 1));
 
 	//Walls colors (left)
-	triangles[6].setColor(glm::vec3(1.0f, 0.5f, 0.0f));
-	triangles[7].setColor(glm::vec3(1.0f, 0.5f, 0.0f));
-	triangles[8].setColor(glm::vec3(0.95f, 0.25f, 0.3f));
-	triangles[9].setColor(glm::vec3(0.95f, 0.25f, 0.3f));
-	triangles[10].setColor(glm::vec3(0.3f, 0.25f, 0.95f));
-	triangles[11].setColor(glm::vec3(0.3f, 0.25f, 0.95f));
+	triangles[6].setColor(glm::vec3(0.87f, 0.2f, 0.33f));
+	triangles[7].setColor(glm::vec3(0.87f, 0.2f, 0.33f));
+	triangles[8].setColor(glm::vec3(0.87f, 0.2f, 0.33f));
+	triangles[9].setColor(glm::vec3(0.87f, 0.2f, 0.33f));
+	triangles[10].setColor(glm::vec3(0.87f, 0.2f, 0.33f));
+	triangles[11].setColor(glm::vec3(0.87f, 0.2f, 0.33f));
 
 	//Walls normals (left)
 	triangles[6].setNormal(glm::vec3(2 / sqrt(5), -1 / sqrt(5), 0));
@@ -81,12 +81,12 @@ void Scene::createScene() {
 	triangles[17].setVertices(glm::vec4(-3, 0, -5, 1), glm::vec4(0, -6, 5, 1), glm::vec4(-3, 0, 5, 1));
 
 	//Walls colors (right)
-	triangles[12].setColor(glm::vec3(0.1f, 0.95f, 0.3f));
-	triangles[13].setColor(glm::vec3(0.1f, 0.95f, 0.3f));
-	triangles[14].setColor(glm::vec3(0.3f, 0.95f, 0.1f));
-	triangles[15].setColor(glm::vec3(0.3f, 0.95f, 0.1f));
-	triangles[16].setColor(glm::vec3(1.0f, 0.5f, 1.0f));
-	triangles[17].setColor(glm::vec3(1.0f, 0.5f, 1.0f));
+	triangles[12].setColor(glm::vec3(0.2f, 0.87f, 0.73f));
+	triangles[13].setColor(glm::vec3(0.2f, 0.87f, 0.73f));
+	triangles[14].setColor(glm::vec3(0.2f, 0.87f, 0.73f));
+	triangles[15].setColor(glm::vec3(0.2f, 0.87f, 0.73f));
+	triangles[16].setColor(glm::vec3(0.2f, 0.87f, 0.73f));
+	triangles[17].setColor(glm::vec3(0.2f, 0.87f, 0.73f));
 
 	//Walls normals (right)
 	triangles[12].setNormal(glm::vec3(-2 / sqrt(5), 1 / sqrt(5), 0));
@@ -121,8 +121,8 @@ void Scene::createScene() {
 	triangles[23].setNormal(glm::vec3(0, 0, -1));
 
 	//Light vertices
-	triangles[24].setVertices(glm::vec4(4, 1, 4.9f, 1), glm::vec4(6, 1, 4.9f, 1), glm::vec4(6, -1, 4.9f, 1));
-	triangles[25].setVertices(glm::vec4(6, -1, 4.9f, 1), glm::vec4(4, -1, 4.9f, 1), glm::vec4(4, 1, 4.9f, 1));
+	triangles[24].setVertices(glm::vec4(4, 1, 4.99f, 1), glm::vec4(6, 1, 4.99f, 1), glm::vec4(6, -1, 4.99f, 1));
+	triangles[25].setVertices(glm::vec4(6, -1, 4.99f, 1), glm::vec4(4, -1, 4.99f, 1), glm::vec4(4, 1, 4.99f, 1));
 	//Light normals
 	triangles[24].setNormal(glm::vec3(0, 0, -1));
 	triangles[25].setNormal(glm::vec3(0, 0, -1));
@@ -163,12 +163,12 @@ void Scene::createScene() {
 	//Spheres
 	spheres[0].setCenter(glm::vec3(5, 3, -1));
 	spheres[0].setRadius(1.0f);
-	spheres[0].setColor(glm::vec3(1, 0, 0));
+	spheres[0].setColor(glm::vec3(1, 1, 1));
 	spheres[0].setMaterial(lambertian);
 
-	spheres[1].setCenter(glm::vec3(10, 0, 0));
-	spheres[1].setRadius(1.0f);
-	spheres[1].setColor(glm::vec3(1, 1, 0));
+	spheres[1].setCenter(glm::vec3(8, 1, -3));
+	spheres[1].setRadius(1.5f);
+	spheres[1].setColor(glm::vec3(1, 1, 1));
 	spheres[1].setMaterial(pureReflect);
 
 	/*spheres[2].setCenter(glm::vec3(5, -3, -3));
@@ -182,10 +182,10 @@ void Scene::createScene() {
 		triangles[i].setMaterial(lambertian);
 	}
 	//DEBUGGING MAT
-	for (int i = 14; i <= 15; i++)
+	/*for (int i = 14; i <= 15; i++)
 	{
 		triangles[i].setMaterial(pureReflect);
-	}
+	}*/
 }
 
 glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) {
@@ -312,7 +312,7 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) {
 glm::vec3 Scene::calculateDirectLight(Intersection* root) {
 
 	glm::vec3 Ld, L = glm::vec3(0.0);
-	int const numberOfShadowRays = 8;
+	int const numberOfShadowRays = 30;
 
 	glm::vec3 v0 = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::vec3 v1 = glm::vec3(0.0f, 2.0f, 0.0f);
@@ -340,7 +340,7 @@ glm::vec3 Scene::calculateDirectLight(Intersection* root) {
 		//Magic
 		q.x += 4.0f;
 		q.y -= 1.0f;
-		q.z += 4.9f;
+		q.z += 4.99f;
 		
 		Sk = q - root->point;
 		d = glm::length(Sk);
@@ -351,7 +351,7 @@ glm::vec3 Scene::calculateDirectLight(Intersection* root) {
 		if (!this->isVisible(shadowRay)) Vk = 0.0f;
 		else Vk = 1.0f;
 
-		if (root->point.z > 4.9f) Vk = 0.0f;
+		if (root->point.z > 4.99f) Vk = 0.0f;
 
 		//TODO: Take into account BRDF on L (For now only lambertian)
 		//Maybe here or in the recursive call

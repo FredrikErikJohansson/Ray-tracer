@@ -129,6 +129,7 @@
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
       <OpenMPSupport>true</OpenMPSupport>
+      <AdditionalOptions>/Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
