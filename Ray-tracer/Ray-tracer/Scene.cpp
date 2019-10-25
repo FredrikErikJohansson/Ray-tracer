@@ -146,6 +146,7 @@ void Scene::createScene() {
 
 	Material lambertian;
 	lambertian.setType("LAMBERTIAN");
+	lambertian.setReflectCof(0.5f);
 
 	Material light;
 	light.setType("LIGHT");
@@ -191,12 +192,14 @@ void Scene::createScene() {
 glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) {
 
 	float reflectCof = 1.0f;
-
+	float minDistance = 1000.0f;
 
 	glm::vec3 color = glm::vec3(0.0f);
 	glm::vec3 reflectedLight = glm::vec3(0.f);
 	glm::vec3 intersection = glm::vec3(0.0f);
-	float minDistance = 1000.0f;
+	glm::vec3 indirectLight = glm::vec3(0.0f);
+	glm::vec3 directLight = glm::vec3(0.0f);
+	
 	for (Triangle triangle : triangles) {
 		if (triangle.rayIntersection(ray, intersection)) {
 			if (glm::length(intersection - glm::vec3(ray.getStartPoint())) < minDistance) {
@@ -220,10 +223,6 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) {
 
 	if (root->closest == "") return glm::vec3(0.0f);
 
-	/*if (root->closest == "SPHERE")
-		if (root->sphere.getMaterial().getType() == "LAMBERTIAN")
-			std::cout << root->sphere.getMaterial().getType() << std::endl;*/
-
 	if (ray.getdepth() < 20) {
 		if (root->closest == "TRIANGLE") {
 			if (root->triangle.getMaterial().getType() == "LIGHT") {
@@ -231,60 +230,50 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root) {
 			}
 			else if (root->triangle.getMaterial().getType() == "MIRROR") {
 
-				root->R = new Intersection(root);
-				//root->R->Parent = root;
-
+				root->R = new Intersection();
 
 				ray++;
 				reflectCof = root->triangle.getMaterial().getReflectCof();
-				reflectedLight = this->getIntersection(this->getReflection(ray, root), root->R)*reflectCof;
+				reflectedLight = this->getIntersection(this->getReflection(ray, root), root->R) * reflectCof;
 			}
 			else if (root->triangle.getMaterial().getType() == "LAMBERTIAN") {
-				float r = uniformRand();
 				
-				Ray dummy = this->getRandomRay(ray, root);
+				Ray RR = this->getRandomRay(ray, root);
 
-				if (glm::vec3(dummy.getStartPoint()) != glm::vec3(0.0f) && glm::vec3(dummy.getEndPoint()) != glm::vec3(0.0f)) {
-					root->R = new Intersection(root);
-					//root->R->Parent = root;
-					root->R->importance = root->importance;
+				if (glm::vec3(RR.getStartPoint()) != glm::vec3(0.0f) && glm::vec3(RR.getEndPoint()) != glm::vec3(0.0f)) {
+					root->R = new Intersection();
 
-					//ray++;
-					reflectedLight = 0.5f*(this->getIntersection(dummy, root->R));
+					ray++;
+					reflectCof = root->triangle.getMaterial().getReflectCof();
+					reflectedLight = reflectCof * (this->getIntersection(RR, root->R));
 				}
 			}
 		}
 		else if (root->closest == "SPHERE") {
 			if (root->sphere.getMaterial().getType() == "MIRROR") {
 
-				root->R = new Intersection(root);
-				//root->R->Parent = root;
+				root->R = new Intersection();
 
-
+				ray++;
 				reflectCof = root->sphere.getMaterial().getReflectCof();
-				reflectedLight = this->getIntersection(this->getReflection(ray, root), root->R)*reflectCof;
+				reflectedLight = this->getIntersection(this->getReflection(ray, root), root->R) * reflectCof;
 			}
 			else if (root->sphere.getMaterial().getType() == "LAMBERTIAN") {
-				float r = uniformRand();
 
-				Ray dummy = this->getRandomRay(ray, root);
+				Ray RR = this->getRandomRay(ray, root);
 
-				if (glm::vec3(dummy.getStartPoint()) != glm::vec3(0.0f) && glm::vec3(dummy.getEndPoint()) != glm::vec3(0.0f)) {
-					root->R = new Intersection(root);
-					//root->R->Parent = root;
+				if (glm::vec3(RR.getStartPoint()) != glm::vec3(0.0f) && glm::vec3(RR.getEndPoint()) != glm::vec3(0.0f)) {
+					root->R = new Intersection();
 
-
-					root->R->importance = root->importance;
-
-					reflectedLight = 0.5f*(this->getIntersection(dummy, root->R));
+					ray++;
+					reflectCof = root->sphere.getMaterial().getReflectCof();
+					reflectedLight = reflectCof * (this->getIntersection(RR, root->R));
 				}
 			}
 		}
 	}
+	ray--;
 
-
-	glm::vec3 indirectLight = glm::vec3(0.f);
-	glm::vec3 directLight = glm::vec3(0.f);
 
 	indirectLight = reflectedLight;
 	if (root->closest == "TRIANGLE") {
@@ -374,6 +363,7 @@ glm::vec3 Scene::calculateDirectLight(Intersection* root) {
 Ray Scene::getRandomRay(Ray ray, Intersection* root) {
 	float pi = 3.1415926535897f;
 	float rand1, rand2 = 0.0f;
+	float terminate = 0.25f;
 
 	glm::vec3 helper = glm::vec3(0.0f);
 	glm::vec3 tangent = glm::vec3(0.0f);
@@ -398,7 +388,7 @@ Ray Scene::getRandomRay(Ray ray, Intersection* root) {
 
 	float inclination = asin(sqrt(rand1));
 	float azimuth = 0.0f;
-	if(rand2 <= 0.75f)
+	if(rand2 <= (1.0f - terminate))
 		azimuth = 2.0f * pi / (rand2);
 	else return  Ray(glm::vec3(0.0f), glm::vec3(0.0f)); //Use a bool instead
 

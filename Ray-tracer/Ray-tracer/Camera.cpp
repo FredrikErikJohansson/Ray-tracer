@@ -52,14 +52,25 @@ void Camera::render(Scene scene) {
 			//pixelColor += scene.getIntersection(ray, root);
 			//root->destroy();
 
+
 			//Supersampling
+			float A, B = 1.0f;
 			currentPixel.y -= (SIZE - 1) / (2 * SIZE * SIZE);
 			currentPixel.z -= (SIZE - 1) / (2 * SIZE * SIZE);
 			for (int a = 0; a < SUB_SIZE; a++) {
 				for (int b = 0; b < SUB_SIZE; b++) {
-					Intersection* root = new Intersection(nullptr);
-					currentPixel.y += 1 / (2 * SIZE * SIZE) * a;
-					currentPixel.z += 1 / (2 * SIZE * SIZE) * b;;
+					Intersection* root = new Intersection();
+					if (AA) {
+						A = scene.uniformRand();
+						B = scene.uniformRand();
+						currentPixel.y += (1 / (SIZE * SIZE) * a) * A;
+						currentPixel.z += (1 / (SIZE * SIZE) * b) * B;
+					}
+					else {
+						currentPixel.y += 1 / (2 * SIZE * SIZE) * a;
+						currentPixel.z += 1 / (2 * SIZE * SIZE) * b;
+					}
+					
 					ray = Ray(eye, glm::vec4(currentPixel, 1));
 					pixelColor += scene.getIntersection(ray, root);
 					root->destroy();
