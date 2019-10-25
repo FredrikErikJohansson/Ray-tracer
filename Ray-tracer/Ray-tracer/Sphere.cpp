@@ -48,7 +48,7 @@ void Sphere::setMaterial(Material _material) {
 	material = _material;
 }
 
-bool Sphere::rayIntersection(Ray ray, glm::vec3 &intersection) {
+bool Sphere::rayIntersection(Ray ray, glm::vec3 &intersection, bool inside) {
 	glm::vec3 rayStart = ray.getStartPoint();
 	glm::vec3 direction = ray.getDirection();
 	float b, c, d1, d2, d, x = 0.0f;
@@ -76,7 +76,8 @@ bool Sphere::rayIntersection(Ray ray, glm::vec3 &intersection) {
 	glm::vec3 normal = glm::normalize(intersection - this->center);
 
 	//Check if sphere is infront of ray
-	if (glm::dot(ray.getDirection(), normal) > 0.0f) return false;
+	if(!inside)
+		if (glm::dot(ray.getDirection(), normal) > 0.0f) return false;
 
 	//float xx = ((float)rand() / RAND_MAX) * (6 - 4) + 4;
 	//float yy = ((float)rand() / RAND_MAX) * (1 + 1) - 1;

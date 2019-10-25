@@ -13,7 +13,7 @@ public:
 	Triangle();
 	~Triangle();
 
-	bool rayIntersection(Ray arg, glm::vec3&);
+	bool rayIntersection(Ray arg, glm::vec3&, bool inside);
 
 	 glm::vec3 getColor() ;
 	 glm::vec3 getNormal() ;

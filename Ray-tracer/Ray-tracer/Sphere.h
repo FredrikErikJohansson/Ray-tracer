@@ -14,7 +14,7 @@ public:
 	Sphere();
 	~Sphere();
 
-	bool rayIntersection(Ray ray, glm::vec3&);
+	bool rayIntersection(Ray ray, glm::vec3&, bool inside);
 
 	float getBrightness();
 	glm::vec3 getColor();

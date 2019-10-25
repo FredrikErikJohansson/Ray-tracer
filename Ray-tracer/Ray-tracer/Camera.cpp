@@ -31,11 +31,10 @@ void Camera::render(Scene scene) {
 	if (eyeSwitch) eye = eye01;
 	else eye = eye00;
 
-
 	double start, end, runTime;
 	start = omp_get_wtime();
 	for (int i = 0; i < SIZE; i++) {
-		if ( i % 10 == 0 ) std::cout << i + 1 << "/" << SIZE << std::endl;
+		if (i % 10 == 0) std::cout << "\r" << (i*100)/SIZE << "%";
 		#pragma omp parallel for
 		for (int j = 0; j < SIZE; j++) {
 
@@ -55,6 +54,7 @@ void Camera::render(Scene scene) {
 
 			//Supersampling
 			float A, B = 1.0f;
+			bool inside = false;
 			currentPixel.y -= (SIZE - 1) / (2 * SIZE * SIZE);
 			currentPixel.z -= (SIZE - 1) / (2 * SIZE * SIZE);
 			for (int a = 0; a < SUB_SIZE; a++) {
@@ -72,7 +72,7 @@ void Camera::render(Scene scene) {
 					}
 					
 					ray = Ray(eye, glm::vec4(currentPixel, 1));
-					pixelColor += scene.getIntersection(ray, root);
+					pixelColor += scene.getIntersection(ray, root, inside);
 					root->destroy();
 				}
 			}
@@ -88,6 +88,7 @@ void Camera::render(Scene scene) {
 	}
 	end = omp_get_wtime();
 	runTime = end - start;
+	std::cout << std::endl;
 	std::cout << "Elapsed time: " << runTime << " seconds." << std::endl;
 	
 	//Map the color values from the max values

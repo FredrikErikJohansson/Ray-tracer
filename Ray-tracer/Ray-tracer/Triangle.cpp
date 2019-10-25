@@ -45,7 +45,7 @@ void Triangle::setMaterial(Material& _material) {
 	material = _material;
 }
 
-bool Triangle::rayIntersection(Ray ray, glm::vec3 &intersection) {
+bool Triangle::rayIntersection(Ray ray, glm::vec3 &intersection, bool inside) {
 	
 	glm::vec3 rayStart = ray.getStartPoint();
 	glm::vec3 rayEnd = ray.getEndPoint();
@@ -68,7 +68,8 @@ bool Triangle::rayIntersection(Ray ray, glm::vec3 &intersection) {
 	glm::vec3 currentHit = (1 - u - v)*v0 + u * v1 + v * v2;
 
 	//Check if triangle is infront of ray
-	if (glm::dot(ray.getDirection(), this->normal) > 0.0f) return false;
+	if(!inside)
+		if (glm::dot(ray.getDirection(), this->normal) > 0.0f) return false;
 
 	//Make visibility test (if not visible set brightness to 0)
 	//traceShadowRay() which calls rayIntersection
