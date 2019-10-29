@@ -191,12 +191,11 @@ void Scene::createScene() {
 
 glm::vec3 Scene::getIntersection(Ray ray, Intersection* root, bool &inside) {
 
-	float reflectCof, refTheta = 1.0f;
 	float minDistance = 1000.0f;
 
 	glm::vec3 color = glm::vec3(0.0f);
-	glm::vec3 reflectedLight = glm::vec3(0.f);
-	glm::vec3 refractedLight = glm::vec3(0.f);
+	glm::vec3 reflectedLight = glm::vec3(0.0f);
+	glm::vec3 refractedLight = glm::vec3(0.0f);
 	glm::vec3 intersection = glm::vec3(0.0f);
 	glm::vec3 indirectLight = glm::vec3(0.0f);
 	glm::vec3 directLight = glm::vec3(0.0f);
@@ -228,114 +227,87 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root, bool &inside) {
 
 	if (ray.getdepth() < 20) {
 		if (root->closest == "TRIANGLE") {
-			if (root->triangle.getMaterial().getType() == "LIGHT") {
-				return lightBrightness;
-			}
-			else if (root->triangle.getMaterial().getType() == "MIRROR") {
-
-				root->R = new Intersection();
-				ray++;
-				nextRay = this->getReflection(ray, root, inside);
-				nextRay.setDepth(ray.getdepth());
-				reflectCof = root->triangle.getMaterial().getReflectCof();
-				reflectedLight = this->getIntersection(nextRay, root->R, inside) * reflectCof;
-			}
-			else if (root->triangle.getMaterial().getType() == "TRANSPARENT") {
-
-				//Schlicks law
-				reflectCof = pow(((1.0f - root->triangle.getMaterial().getN()) / (1.0f + root->triangle.getMaterial().getN())), 2.0f);
-				refTheta = reflectCof + (1 - reflectCof) * pow((1.0f - cos(glm::dot(ray.getDirection(), root->triangle.getNormal()))), 5.0f);
-
-				root->R = new Intersection();
-				ray++;
-				nextRay = this->getReflection(ray, root, inside);
-				nextRay.setDepth(ray.getdepth());
-				reflectedLight = this->getIntersection(nextRay, root->R, inside);
-
-				nextRay = this->getRefraction(ray, root, inside);
-				if (reflectedLight != lightBrightness && glm::vec3(nextRay.getStartPoint()) != glm::vec3(0.0f) && glm::vec3(nextRay.getEndPoint()) != glm::vec3(0.0f)) {
-					reflectedLight *= refTheta;
-					root->T = new Intersection();
-					ray++;
-					nextRay.setDepth(ray.getdepth());
-					refractedLight = this->getIntersection(nextRay, root->T, inside) * (1.0f - refTheta);
-				}
-	
-			}
-			else if (root->triangle.getMaterial().getType() == "LAMBERTIAN") {
-				
-				nextRay = this->getRandomRay(ray, root);
-
-				if (glm::vec3(nextRay.getStartPoint()) != glm::vec3(0.0f) && glm::vec3(nextRay.getEndPoint()) != glm::vec3(0.0f)) {
-					root->R = new Intersection();
-					ray++;
-					nextRay.setDepth(ray.getdepth());
-					reflectCof = root->triangle.getMaterial().getReflectCof();
-					reflectedLight = reflectCof * (this->getIntersection(nextRay, root->R, inside));
-				}
-			}
-		}
+			indirectLight = this->getLightContribution(ray, root, root->triangle, inside);
+			ray--;
+			if (root->triangle.getMaterial().getType() != "MIRROR" && root->triangle.getMaterial().getType() != "TRANSPARENT")
+				directLight = calculateDirectLight(root);
+		}			
 		else if (root->closest == "SPHERE") {
-			if (root->sphere.getMaterial().getType() == "MIRROR") {
-
-				root->R = new Intersection();
-				ray++;
-				nextRay = this->getReflection(ray, root, inside);
-				nextRay.setDepth(ray.getdepth());
-				reflectCof = root->sphere.getMaterial().getReflectCof();
-				reflectedLight = this->getIntersection(nextRay, root->R, inside) * reflectCof;
-			}
-			else if (root->sphere.getMaterial().getType() == "TRANSPARENT") {
-
-				//Schlicks law
-				reflectCof = pow(((1.0f - root->sphere.getMaterial().getN()) / (1.0f + root->sphere.getMaterial().getN())), 2.0f);
-				refTheta = reflectCof + (1 - reflectCof) * pow((1.0f - cos(glm::dot(ray.getDirection(), root->sphere.getNormal(root->point)))), 5.0f);
-
-				root->R = new Intersection();
-				ray++;
-				nextRay = this->getReflection(ray, root, inside);
-				nextRay.setDepth(ray.getdepth());
-				reflectedLight = this->getIntersection(nextRay, root->R, inside);
-						
-				nextRay = this->getRefraction(ray, root, inside);
-				if(reflectedLight != lightBrightness && glm::vec3(nextRay.getStartPoint()) != glm::vec3(0.0f) && glm::vec3(nextRay.getEndPoint()) != glm::vec3(0.0f)) {
-					reflectedLight *= refTheta;	
-					root->T = new Intersection();
-					ray++;
-					nextRay.setDepth(ray.getdepth());
-					refractedLight = this->getIntersection(nextRay, root->T, inside) * (1.0f - refTheta);
-				}
-			
-			}
-			else if (root->sphere.getMaterial().getType() == "LAMBERTIAN") {
-
-				nextRay = this->getRandomRay(ray, root);
-
-				if (glm::vec3(nextRay.getStartPoint()) != glm::vec3(0.0f) && glm::vec3(nextRay.getEndPoint()) != glm::vec3(0.0f)) {
-					root->R = new Intersection();
-					ray++;
-					nextRay.setDepth(ray.getdepth());
-					reflectCof = root->sphere.getMaterial().getReflectCof();
-					reflectedLight = reflectCof * (this->getIntersection(nextRay, root->R, inside));
-				}
-			}
-		}
-	}
-	ray--;
-
-
-	indirectLight = reflectedLight + refractedLight;
-	if (root->closest == "TRIANGLE") {
-		if (root->triangle.getMaterial().getType() != "MIRROR" && root->triangle.getMaterial().getType() != "TRANSPARENT")
-			directLight = calculateDirectLight(root);
-	}
-	else if (root->closest == "SPHERE") {
-		if (root->sphere.getMaterial().getType() != "MIRROR" && root->sphere.getMaterial().getType() != "TRANSPARENT")
-			directLight = calculateDirectLight(root);
+			indirectLight = this->getLightContribution(ray, root, root->sphere, inside);
+			ray--;
+			if (root->sphere.getMaterial().getType() != "MIRROR" && root->sphere.getMaterial().getType() != "TRANSPARENT")
+				directLight = calculateDirectLight(root);
+		}		
 	}
 
 	return (indirectLight + directLight);
 };
+
+template <class T>
+glm::vec3 Scene::getLightContribution(Ray ray, Intersection* root, T obj, bool& inside) {
+
+	glm::vec3 N = glm::vec3(0.0f);
+	std::string matType = obj.getMaterial().getType();
+	float reflectCof, refTheta = 1.0f;
+
+	glm::vec3 reflectedLight = glm::vec3(0.f);
+	glm::vec3 refractedLight = glm::vec3(0.f);
+
+	Ray nextRay;
+
+	if (root->closest == "TRIANGLE") N = root->triangle.getNormal();
+	else if (root->closest == "SPHERE") N = root->sphere.getNormal(root->point);
+
+	if (matType == "LIGHT") {
+		return lightBrightness;
+	}
+	else if (matType == "MIRROR") {
+
+		root->R = new Intersection();
+		ray++;
+		nextRay = this->getReflection(ray, root, inside);
+		nextRay.setDepth(ray.getdepth());
+		reflectCof = obj.getMaterial().getReflectCof();
+		reflectedLight = this->getIntersection(nextRay, root->R, inside) * reflectCof;
+	}
+	else if (matType == "TRANSPARENT") {
+
+		//Schlicks law
+		reflectCof = pow(((1.0f - obj.getMaterial().getN()) / (1.0f + obj.getMaterial().getN())), 2.0f);
+		refTheta = reflectCof + (1 - reflectCof) * pow((1.0f - cos(glm::dot(ray.getDirection(), N))), 5.0f);
+
+		root->R = new Intersection();
+		ray++;
+		nextRay = this->getReflection(ray, root, inside);
+		nextRay.setDepth(ray.getdepth());
+		reflectedLight = this->getIntersection(nextRay, root->R, inside);
+
+		nextRay = this->getRefraction(ray, root, inside);
+		if (reflectedLight != lightBrightness && glm::vec3(nextRay.getStartPoint()) != glm::vec3(0.0f) && glm::vec3(nextRay.getEndPoint()) != glm::vec3(0.0f)) {
+			reflectedLight *= refTheta;
+			root->T = new Intersection();
+			ray++;
+			nextRay.setDepth(ray.getdepth());
+			refractedLight = this->getIntersection(nextRay, root->T, inside) * (1.0f - refTheta);
+		}
+
+	}
+	else if (matType == "LAMBERTIAN") {
+
+		nextRay = this->getRandomRay(ray, root);
+
+		if (glm::vec3(nextRay.getStartPoint()) != glm::vec3(0.0f) && glm::vec3(nextRay.getEndPoint()) != glm::vec3(0.0f)) {
+			root->R = new Intersection();
+			ray++;
+			nextRay.setDepth(ray.getdepth());
+			reflectCof = obj.getMaterial().getReflectCof();
+			reflectedLight = reflectCof * (this->getIntersection(nextRay, root->R, inside));
+		}
+	}
+
+	return (reflectedLight + refractedLight);
+
+}
 
 glm::vec3 Scene::calculateDirectLight(Intersection* root) {
 

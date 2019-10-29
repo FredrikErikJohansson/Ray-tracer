@@ -34,8 +34,11 @@ public:
 
 	Ray getRandomRay(Ray ray, Intersection* leaf);
 	glm::vec3 getIntersection(Ray ray, Intersection* root, bool&);
+	template <class T>
+	glm::vec3 getLightContribution(Ray, Intersection*, T, bool&);
 	Ray getReflection(Ray ray, Intersection* leaf, bool&);
 	Ray getRefraction(Ray ray, Intersection* leaf, bool&);
+	
 
 private:
 
