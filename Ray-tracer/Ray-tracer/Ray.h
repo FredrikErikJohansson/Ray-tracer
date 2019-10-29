@@ -16,6 +16,8 @@ public:
 	float getLength() const;
 	int getdepth() const;
 
+	void setDepth(int);
+
 	void operator++(int);
 	void operator--(int);
 

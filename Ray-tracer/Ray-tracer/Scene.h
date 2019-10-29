@@ -34,7 +34,7 @@ public:
 
 	Ray getRandomRay(Ray ray, Intersection* leaf);
 	glm::vec3 getIntersection(Ray ray, Intersection* root, bool&);
-	Ray getReflection(Ray ray, Intersection* leaf);
+	Ray getReflection(Ray ray, Intersection* leaf, bool&);
 	Ray getRefraction(Ray ray, Intersection* leaf, bool&);
 
 private:
@@ -44,6 +44,8 @@ private:
 	int triangleAmount = 30;
 	int tetrahedronTriangleAmount = 4;
 	int sceneTriangles = 26;
+
+	glm::vec3 lightBrightness = glm::vec3(5.0f);
 
 	Tetrahedron tetrahedron;
 	Triangle triangles[30];

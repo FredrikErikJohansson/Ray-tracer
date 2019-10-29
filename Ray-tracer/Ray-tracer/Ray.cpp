@@ -22,6 +22,10 @@ Ray::~Ray()
 {
 }
 
+void Ray::setDepth(int _depth) {
+	depth = _depth;
+}
+
 glm::vec4 Ray::getStartPoint() const {
 	return startPoint;
 }
