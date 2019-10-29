@@ -10,8 +10,8 @@
 #include "Scene.h"
 
 //SHOULD BE 800
-const int SIZE = 800;
-const int SUB_SIZE = 8;
+const int SIZE = 400;
+const int SUB_SIZE = 2;
 const bool AA = true;
 
 class Camera
