@@ -30,7 +30,7 @@ public:
 	float uniformRand();
 	float randMinMax(const float &min, const float &max);
 
-	glm::vec3 calculateDirectLight(Intersection* root);
+	glm::vec3 calculateDirectLight(Intersection* root, bool&);
 
 	Ray getRandomRay(Ray ray, Intersection* leaf);
 	glm::vec3 getIntersection(Ray ray, Intersection* root, bool&);

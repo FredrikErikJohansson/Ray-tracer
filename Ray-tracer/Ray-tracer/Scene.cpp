@@ -225,19 +225,23 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root, bool &inside) {
 
 	if (ray.getdepth() < 10) {
 		if (root->closest == "TRIANGLE") {
-			if (root->triangle.getMaterial().getType() == "LIGHT") return lightBrightness;
 			indirectLight = this->getLightContribution(ray, root, root->triangle, inside);
-			ray--;
-			if (root->triangle.getMaterial().getType() != "MIRROR" && root->triangle.getMaterial().getType() != "TRANSPARENT")
-				directLight = calculateDirectLight(root);
+			
 		}			
 		else if (root->closest == "SPHERE") {
-			if (root->sphere.getMaterial().getType() == "LIGHT") return lightBrightness;
-			indirectLight = this->getLightContribution(ray, root, root->sphere, inside);
-			ray--;
-			if (root->sphere.getMaterial().getType() != "MIRROR" && root->sphere.getMaterial().getType() != "TRANSPARENT")
-				directLight = calculateDirectLight(root);
+			indirectLight = this->getLightContribution(ray, root, root->sphere, inside);		
 		}		
+	}
+
+	ray--;
+
+	if (root->closest == "TRIANGLE") {
+		if (root->triangle.getMaterial().getType() != "MIRROR" && root->triangle.getMaterial().getType() != "TRANSPARENT")
+			directLight = calculateDirectLight(root, inside);
+	}
+	else if (root->closest == "SPHERE") {
+		if (root->sphere.getMaterial().getType() != "MIRROR" && root->sphere.getMaterial().getType() != "TRANSPARENT")
+			directLight = calculateDirectLight(root, inside);
 	}
 
 	return (indirectLight + directLight);
@@ -314,7 +318,7 @@ glm::vec3 Scene::getLightContribution(Ray ray, Intersection* root, T obj, bool& 
 
 }
 
-glm::vec3 Scene::calculateDirectLight(Intersection* root) {
+glm::vec3 Scene::calculateDirectLight(Intersection* root, bool & inside) {
 
 	glm::vec3 Ld, L = glm::vec3(0.0);
 	int const numberOfShadowRays = 30;
@@ -423,15 +427,17 @@ Ray Scene::getRandomRay(Ray ray, Intersection* root) {
 Ray Scene::getReflection(Ray ray, Intersection* leaf, bool &inside) {
 	glm::vec3 L = ray.getDirection();
 	glm::vec3 N = glm::vec3(0.0f);
+	inside = false;
+
 	if (leaf->closest == "TRIANGLE") {
 		N = leaf->triangle.getNormal();
-		if (leaf->triangle.getMaterial().getType() == "TRANSPARENT" && ray.getdepth() > 2) inside = true;
-		else inside = false;
+		//if (leaf->triangle.getMaterial().getType() == "TRANSPARENT") inside = true;
+		//else inside = false;
 	}
 	else if (leaf->closest == "SPHERE") {
 		N = glm::normalize(leaf->point - leaf->sphere.getCenter());
-		if (leaf->sphere.getMaterial().getType() == "TRANSPARENT" && ray.getdepth() > 2) inside = true;
-		else inside = false;
+		//if (leaf->sphere.getMaterial().getType() == "TRANSPARENT") inside = true;
+		//else inside = false;
 	}
 
 	if (inside) N = -N;
