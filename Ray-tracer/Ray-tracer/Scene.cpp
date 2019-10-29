@@ -199,8 +199,6 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root, bool &inside) {
 	glm::vec3 intersection = glm::vec3(0.0f);
 	glm::vec3 indirectLight = glm::vec3(0.0f);
 	glm::vec3 directLight = glm::vec3(0.0f);
-
-	Ray nextRay;
 	
 	for (Triangle triangle : triangles) {
 		if (triangle.rayIntersection(ray, intersection, inside)) {
@@ -217,7 +215,7 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root, bool &inside) {
 			if (glm::length(intersection - glm::vec3(ray.getStartPoint())) < minDistance) {
 				minDistance = glm::length(intersection - glm::vec3(ray.getStartPoint()));
 				root->sphere = sphere;
-				root->point = intersection + 0.001f * root->sphere.getNormal(intersection);
+				root->point = intersection + 0.001f * sphere.getNormal(intersection);
 				root->closest = "SPHERE";
 			}
 		}
@@ -225,14 +223,16 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root, bool &inside) {
 
 	if (root->closest == "") return glm::vec3(0.0f);
 
-	if (ray.getdepth() < 20) {
+	if (ray.getdepth() < 10) {
 		if (root->closest == "TRIANGLE") {
+			if (root->triangle.getMaterial().getType() == "LIGHT") return lightBrightness;
 			indirectLight = this->getLightContribution(ray, root, root->triangle, inside);
 			ray--;
 			if (root->triangle.getMaterial().getType() != "MIRROR" && root->triangle.getMaterial().getType() != "TRANSPARENT")
 				directLight = calculateDirectLight(root);
 		}			
 		else if (root->closest == "SPHERE") {
+			if (root->sphere.getMaterial().getType() == "LIGHT") return lightBrightness;
 			indirectLight = this->getLightContribution(ray, root, root->sphere, inside);
 			ray--;
 			if (root->sphere.getMaterial().getType() != "MIRROR" && root->sphere.getMaterial().getType() != "TRANSPARENT")
@@ -253,7 +253,8 @@ glm::vec3 Scene::getLightContribution(Ray ray, Intersection* root, T obj, bool& 
 	glm::vec3 reflectedLight = glm::vec3(0.f);
 	glm::vec3 refractedLight = glm::vec3(0.f);
 
-	Ray nextRay;
+	Ray nextReflected;
+	Ray nextTransmitted;
 
 	if (root->closest == "TRIANGLE") N = root->triangle.getNormal();
 	else if (root->closest == "SPHERE") N = root->sphere.getNormal(root->point);
@@ -265,10 +266,10 @@ glm::vec3 Scene::getLightContribution(Ray ray, Intersection* root, T obj, bool& 
 
 		root->R = new Intersection();
 		ray++;
-		nextRay = this->getReflection(ray, root, inside);
-		nextRay.setDepth(ray.getdepth());
+		nextReflected = this->getReflection(ray, root, inside);
+		nextReflected.setDepth(ray.getdepth());
 		reflectCof = obj.getMaterial().getReflectCof();
-		reflectedLight = this->getIntersection(nextRay, root->R, inside) * reflectCof;
+		reflectedLight = this->getIntersection(nextReflected, root->R, inside) * reflectCof;
 	}
 	else if (matType == "TRANSPARENT") {
 
@@ -276,32 +277,36 @@ glm::vec3 Scene::getLightContribution(Ray ray, Intersection* root, T obj, bool& 
 		reflectCof = pow(((1.0f - obj.getMaterial().getN()) / (1.0f + obj.getMaterial().getN())), 2.0f);
 		refTheta = reflectCof + (1 - reflectCof) * pow((1.0f - cos(glm::dot(ray.getDirection(), N))), 5.0f);
 
+		
 		root->R = new Intersection();
 		ray++;
-		nextRay = this->getReflection(ray, root, inside);
-		nextRay.setDepth(ray.getdepth());
-		reflectedLight = this->getIntersection(nextRay, root->R, inside);
+		nextReflected = this->getReflection(ray, root, inside);
+		nextReflected.setDepth(ray.getdepth());
+		reflectedLight = this->getIntersection(nextReflected, root->R, inside);
 
-		nextRay = this->getRefraction(ray, root, inside);
-		if (reflectedLight != lightBrightness && glm::vec3(nextRay.getStartPoint()) != glm::vec3(0.0f) && glm::vec3(nextRay.getEndPoint()) != glm::vec3(0.0f)) {
+		nextTransmitted = this->getRefraction(ray, root, inside);
+		if (glm::distance(reflectedLight, lightBrightness) > 0.1f) {
 			reflectedLight *= refTheta;
-			root->T = new Intersection();
-			ray++;
-			nextRay.setDepth(ray.getdepth());
-			refractedLight = this->getIntersection(nextRay, root->T, inside) * (1.0f - refTheta);
+			if (glm::vec3(nextTransmitted.getStartPoint()) != glm::vec3(0.0f) && glm::vec3(nextTransmitted.getEndPoint()) != glm::vec3(0.0f)) {
+				
+				root->T = new Intersection();
+				ray++;
+				nextTransmitted.setDepth(ray.getdepth());
+				refractedLight = this->getIntersection(nextTransmitted, root->T, inside) * (1.0f - refTheta);
+			}
 		}
 
 	}
 	else if (matType == "LAMBERTIAN") {
 
-		nextRay = this->getRandomRay(ray, root);
+		nextReflected = this->getRandomRay(ray, root);
 
-		if (glm::vec3(nextRay.getStartPoint()) != glm::vec3(0.0f) && glm::vec3(nextRay.getEndPoint()) != glm::vec3(0.0f)) {
+		if (glm::vec3(nextReflected.getStartPoint()) != glm::vec3(0.0f) && glm::vec3(nextReflected.getEndPoint()) != glm::vec3(0.0f)) {
 			root->R = new Intersection();
 			ray++;
-			nextRay.setDepth(ray.getdepth());
+			nextReflected.setDepth(ray.getdepth());
 			reflectCof = obj.getMaterial().getReflectCof();
-			reflectedLight = reflectCof * (this->getIntersection(nextRay, root->R, inside));
+			reflectedLight = reflectCof * (this->getIntersection(nextReflected, root->R, inside));
 		}
 	}
 
@@ -420,12 +425,12 @@ Ray Scene::getReflection(Ray ray, Intersection* leaf, bool &inside) {
 	glm::vec3 N = glm::vec3(0.0f);
 	if (leaf->closest == "TRIANGLE") {
 		N = leaf->triangle.getNormal();
-		if (leaf->triangle.getMaterial().getType() == "TRANSPARENT") inside = true;
+		if (leaf->triangle.getMaterial().getType() == "TRANSPARENT" && ray.getdepth() > 2) inside = true;
 		else inside = false;
 	}
 	else if (leaf->closest == "SPHERE") {
 		N = glm::normalize(leaf->point - leaf->sphere.getCenter());
-		if (leaf->triangle.getMaterial().getType() == "TRANSPARENT") inside = true;
+		if (leaf->sphere.getMaterial().getType() == "TRANSPARENT" && ray.getdepth() > 2) inside = true;
 		else inside = false;
 	}
 
