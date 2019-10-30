@@ -235,21 +235,25 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root, bool &inside) {
 
 	if (ray.getdepth() < 10) {
 		if (root->closest == "TRIANGLE") {
-			indirectLight = this->getLightContribution(ray, root, root->triangle, inside);
+			if(root->triangle.getMaterial().getType() != "LIGHT")
+				indirectLight = this->getLightContribution(ray, root, root->triangle, inside);
 			
 		}			
 		else if (root->closest == "SPHERE") {
-			indirectLight = this->getLightContribution(ray, root, root->sphere, inside);		
+			if (root->sphere.getMaterial().getType() != "LIGHT")
+				indirectLight = this->getLightContribution(ray, root, root->sphere, inside);		
 		}		
 	}
 
 	ray--;
 
 	if (root->closest == "TRIANGLE") {
+		if (root->triangle.getMaterial().getType() == "LIGHT") return lightBrightness;
 		if (root->triangle.getMaterial().getType() != "MIRROR" && root->triangle.getMaterial().getType() != "TRANSPARENT")
 			directLight = calculateDirectLight(root, inside);
 	}
 	else if (root->closest == "SPHERE") {
+		if (root->sphere.getMaterial().getType() == "LIGHT") return lightBrightness;
 		if (root->sphere.getMaterial().getType() != "MIRROR" && root->sphere.getMaterial().getType() != "TRANSPARENT")
 			directLight = calculateDirectLight(root, inside);
 	}
