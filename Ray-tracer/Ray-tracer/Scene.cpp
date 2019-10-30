@@ -187,11 +187,6 @@ void Scene::createScene() {
 	spheres[3].setColor(glm::vec3(1, 1, 1));
 	spheres[3].setMaterial(lambertian);
 
-	spheres[4].setCenter(glm::vec3(7.5f, 1.5f, -4.0f));
-	spheres[4].setRadius(1.0f);
-	spheres[4].setColor(glm::vec3(0.72f, 0.48f, 1.0f));
-	spheres[4].setMaterial(lambertian);
-
 	//DEBUGGING MAT
 	for (int i = 0; i <= 23; i++)
 	{

@@ -54,6 +54,6 @@ private:
 	Tetrahedron tetrahedron;
 	Triangle triangles[30];
 
-	Sphere spheres[5];
+	Sphere spheres[4];
 };
 
