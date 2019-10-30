@@ -1,5 +1,5 @@
 # Ray-tracer
-A whitted ray tracer created in the course TNCG15 - Advanced Global Illumination and Rendering at Linköpings University.
+A Monte Carlo Ray Tracer implemented during the course TNCG15 - Advanced Global Illumination and Rendering at Linköpings University.
 
 ### Getting started:
 Run the following command
