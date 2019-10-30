@@ -33,12 +33,12 @@ void Scene::createScene() {
 	triangles[5].setVertices(glm::vec4(0, 6, -5, 1), glm::vec4(5, 0, -5, 1), glm::vec4(-3, 0, -5, 1));
 
 	//Floor colors
-	triangles[0].setColor(glm::vec3(1, 1, 1));
-	triangles[1].setColor(glm::vec3(1, 1, 1));
-	triangles[2].setColor(glm::vec3(1, 1, 1));
-	triangles[3].setColor(glm::vec3(1, 1, 1));
-	triangles[4].setColor(glm::vec3(1, 1, 1));
-	triangles[5].setColor(glm::vec3(1, 1, 1));
+	triangles[0].setColor(glm::vec3(1.0f, 0.98f, 0.95f));
+	triangles[1].setColor(glm::vec3(1.0f, 0.98f, 0.95f));
+	triangles[2].setColor(glm::vec3(1.0f, 0.98f, 0.95f));
+	triangles[3].setColor(glm::vec3(1.0f, 0.98f, 0.95f));
+	triangles[4].setColor(glm::vec3(1.0f, 0.98f, 0.95f));
+	triangles[5].setColor(glm::vec3(1.0f, 0.98f, 0.95f));
 
 	//Floor normals
 	triangles[0].setNormal(glm::vec3(0, 0, 1));
@@ -57,12 +57,12 @@ void Scene::createScene() {
 	triangles[11].setVertices(glm::vec4(13, 0, -5, 1), glm::vec4(10, 6, 5, 1), glm::vec4(13, 0, 5, 1));
 
 	//Walls colors (left)
-	triangles[6].setColor(glm::vec3(1.0f));
-	triangles[7].setColor(glm::vec3(1.0f));
-	triangles[8].setColor(glm::vec3(0.87f, 0, 0));
-	triangles[9].setColor(glm::vec3(0.87f, 0, 0));
-	triangles[10].setColor(glm::vec3(1.0f));
-	triangles[11].setColor(glm::vec3(1.0f));
+	triangles[6].setColor(glm::vec3(1.0f, 0.4f, 0.4f));
+	triangles[7].setColor(glm::vec3(1.0f, 0.4f, 0.4f));
+	triangles[8].setColor(glm::vec3(1.0f, 0.4f, 0.4f));
+	triangles[9].setColor(glm::vec3(1.0f, 0.4f, 0.4f));
+	triangles[10].setColor(glm::vec3(1.0f, 0.4f, 0.4f));
+	triangles[11].setColor(glm::vec3(1.0f, 0.4f, 0.4f));
 
 	//Walls normals (left)
 	triangles[6].setNormal(glm::vec3(2 / sqrt(5), -1 / sqrt(5), 0));
@@ -81,12 +81,12 @@ void Scene::createScene() {
 	triangles[17].setVertices(glm::vec4(-3, 0, -5, 1), glm::vec4(0, -6, 5, 1), glm::vec4(-3, 0, 5, 1));
 
 	//Walls colors (right)
-	triangles[12].setColor(glm::vec3(1.0f));
-	triangles[13].setColor(glm::vec3(1.0f));
-	triangles[14].setColor(glm::vec3(0, 0.87f, 0));
-	triangles[15].setColor(glm::vec3(0, 0.87f, 0));
-	triangles[16].setColor(glm::vec3(1.0f));
-	triangles[17].setColor(glm::vec3(1.0f));
+	triangles[12].setColor(glm::vec3(0.4f, 1.0f, 0.4f));
+	triangles[13].setColor(glm::vec3(0.4f, 1.0f, 0.4f));
+	triangles[14].setColor(glm::vec3(0.4f, 1.0f, 0.4f));
+	triangles[15].setColor(glm::vec3(0.4f, 1.0f, 0.4f));
+	triangles[16].setColor(glm::vec3(0.4f, 1.0f, 0.4f));
+	triangles[17].setColor(glm::vec3(0.4f, 1.0f, 0.4f));
 
 	//Walls normals (right)
 	triangles[12].setNormal(glm::vec3(-2 / sqrt(5), 1 / sqrt(5), 0));
@@ -105,12 +105,12 @@ void Scene::createScene() {
 	triangles[23].setVertices(glm::vec4(0, 6, 5, 1), glm::vec4(5, 0, 5, 1), glm::vec4(-3, 0, 5, 1));
 
 	//Roof colors
-	triangles[18].setColor(glm::vec3(1, 1, 1));
-	triangles[19].setColor(glm::vec3(1, 1, 1));
-	triangles[20].setColor(glm::vec3(1, 1, 1));
-	triangles[21].setColor(glm::vec3(1, 1, 1));
-	triangles[22].setColor(glm::vec3(1, 1, 1));
-	triangles[23].setColor(glm::vec3(1, 1, 1));
+	triangles[18].setColor(glm::vec3(1.0f, 0.98f, 0.95f));
+	triangles[19].setColor(glm::vec3(1.0f, 0.98f, 0.95f));
+	triangles[20].setColor(glm::vec3(1.0f, 0.98f, 0.95f));
+	triangles[21].setColor(glm::vec3(1.0f, 0.98f, 0.95f));
+	triangles[22].setColor(glm::vec3(1.0f, 0.98f, 0.95f));
+	triangles[23].setColor(glm::vec3(1.0f, 0.98f, 0.95f));
 
 	//Roof normals
 	triangles[18].setNormal(glm::vec3(0, 0, -1));
@@ -127,8 +127,8 @@ void Scene::createScene() {
 	triangles[24].setNormal(glm::vec3(0, 0, -1));
 	triangles[25].setNormal(glm::vec3(0, 0, -1));
 	//Light color
-	triangles[24].setColor(glm::vec3(1, 1, 1));
-	triangles[25].setColor(glm::vec3(1, 1, 1));
+	triangles[24].setColor(glm::vec3(1.0f, 0.98f, 0.95f));
+	triangles[25].setColor(glm::vec3(1.0f, 0.98f, 0.95f));
 
 
 	//Get the triangles of the tetrahedron
@@ -153,7 +153,7 @@ void Scene::createScene() {
 
 	Material orenNayar;
 	orenNayar.setType("OREN-NAYAR");
-	orenNayar.setRoughness(0.5f);
+	orenNayar.setRoughness(0.6f);
 	orenNayar.setReflectCof(0.5f);
 
 	//Light mat
@@ -167,25 +167,30 @@ void Scene::createScene() {
 	triangles[29].setMaterial(lambertian);
 
 	//Spheres
-	spheres[0].setCenter(glm::vec3(7, 3.5f, 1));
+	spheres[0].setCenter(glm::vec3(7, 3.5f, 0));
 	spheres[0].setRadius(1.0f);
 	spheres[0].setColor(glm::vec3(1, 1, 1));
 	spheres[0].setMaterial(orenNayar);
 
-	spheres[1].setCenter(glm::vec3(8, 4, -4.0f));
+	spheres[1].setCenter(glm::vec3(6, 4, -4.0f));
 	spheres[1].setRadius(1.0f);
 	spheres[1].setColor(glm::vec3(1, 1, 1));
 	spheres[1].setMaterial(pureReflect);
 
-	spheres[2].setCenter(glm::vec3(6, -3.5f, -1.0f));
+	spheres[2].setCenter(glm::vec3(5.0f, -3.5f, -2.0f));
 	spheres[2].setRadius(1.0f);
 	spheres[2].setColor(glm::vec3(0, 0, 0));
 	spheres[2].setMaterial(pureTransp);
 
-	spheres[3].setCenter(glm::vec3(8, 1, 1));
+	spheres[3].setCenter(glm::vec3(8, 1, 1.5f));
 	spheres[3].setRadius(1.0f);
 	spheres[3].setColor(glm::vec3(1, 1, 1));
 	spheres[3].setMaterial(lambertian);
+
+	spheres[4].setCenter(glm::vec3(7.5f, 1.5f, -4.0f));
+	spheres[4].setRadius(1.0f);
+	spheres[4].setColor(glm::vec3(0.72f, 0.48f, 1.0f));
+	spheres[4].setMaterial(lambertian);
 
 	//DEBUGGING MAT
 	for (int i = 0; i <= 23; i++)
@@ -445,7 +450,6 @@ Ray Scene::getRandomRay(Ray ray, Intersection* root, glm::vec4 &angleVector) {
 	if(rand2 <= (1.0f - terminate))
 		azimuth = 2.0f * pi / (rand2);
 	else return  Ray(glm::vec3(0.0f), glm::vec3(0.0f));
-
 	//Store in and out inclination and azimuth angles
 	angleVector.x = glm::dot(ray.getDirection(), N);
 	angleVector.y = 0.0f;

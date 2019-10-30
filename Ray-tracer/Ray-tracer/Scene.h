@@ -49,11 +49,11 @@ private:
 	int tetrahedronTriangleAmount = 4;
 	int sceneTriangles = 26;
 
-	glm::vec3 lightBrightness = glm::vec3(5.0f);
+	glm::vec3 lightBrightness = glm::vec3(5.0f, 4.9f, 4.75f);
 
 	Tetrahedron tetrahedron;
 	Triangle triangles[30];
 
-	Sphere spheres[4];
+	Sphere spheres[5];
 };
 
