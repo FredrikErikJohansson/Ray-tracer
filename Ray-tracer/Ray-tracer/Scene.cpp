@@ -151,6 +151,11 @@ void Scene::createScene() {
 	Material light;
 	light.setType("LIGHT");
 
+	Material orenNayar;
+	orenNayar.setType("OREN-NAYAR");
+	orenNayar.setRoughness(0.5f);
+	orenNayar.setReflectCof(0.5f);
+
 	//Light mat
 	triangles[24].setMaterial(light);
 	triangles[25].setMaterial(light);
@@ -162,10 +167,10 @@ void Scene::createScene() {
 	triangles[29].setMaterial(lambertian);
 
 	//Spheres
-	spheres[0].setCenter(glm::vec3(5, 3, 1));
+	spheres[0].setCenter(glm::vec3(7, 3.5f, 1));
 	spheres[0].setRadius(1.0f);
 	spheres[0].setColor(glm::vec3(1, 1, 1));
-	spheres[0].setMaterial(lambertian);
+	spheres[0].setMaterial(orenNayar);
 
 	spheres[1].setCenter(glm::vec3(8, 4, -4.0f));
 	spheres[1].setRadius(1.0f);
@@ -176,6 +181,11 @@ void Scene::createScene() {
 	spheres[2].setRadius(1.0f);
 	spheres[2].setColor(glm::vec3(0, 0, 0));
 	spheres[2].setMaterial(pureTransp);
+
+	spheres[3].setCenter(glm::vec3(8, 1, 1));
+	spheres[3].setRadius(1.0f);
+	spheres[3].setColor(glm::vec3(1, 1, 1));
+	spheres[3].setMaterial(lambertian);
 
 	//DEBUGGING MAT
 	for (int i = 0; i <= 23; i++)
@@ -252,7 +262,7 @@ glm::vec3 Scene::getLightContribution(Ray ray, Intersection* root, T obj, bool& 
 
 	glm::vec3 N = glm::vec3(0.0f);
 	std::string matType = obj.getMaterial().getType();
-	float reflectCof, refTheta = 1.0f;
+	float reflectCof, refTheta, A, B = 1.0f;
 
 	glm::vec3 reflectedLight = glm::vec3(0.f);
 	glm::vec3 refractedLight = glm::vec3(0.f);
@@ -303,7 +313,8 @@ glm::vec3 Scene::getLightContribution(Ray ray, Intersection* root, T obj, bool& 
 	}
 	else if (matType == "LAMBERTIAN") {
 
-		nextReflected = this->getRandomRay(ray, root);
+		glm::vec4 angleVector = glm::vec4(0.0f);
+		nextReflected = this->getRandomRay(ray, root, angleVector);
 
 		if (glm::vec3(nextReflected.getStartPoint()) != glm::vec3(0.0f) && glm::vec3(nextReflected.getEndPoint()) != glm::vec3(0.0f)) {
 			root->R = new Intersection();
@@ -311,6 +322,29 @@ glm::vec3 Scene::getLightContribution(Ray ray, Intersection* root, T obj, bool& 
 			nextReflected.setDepth(ray.getdepth());
 			reflectCof = obj.getMaterial().getReflectCof();
 			reflectedLight = reflectCof * (this->getIntersection(nextReflected, root->R, inside));
+		}
+	}
+	else if (matType == "OREN-NAYAR") {
+
+		float rougnessSquare = pow(obj.getMaterial().getRoughness(), 2.0f);
+		A = 1.0f - (rougnessSquare / 2.0f * (rougnessSquare + 0.33f));
+		B = (0.45f * rougnessSquare) / (rougnessSquare + 0.09f);
+
+		glm::vec4 angleVector = glm::vec4(0.0f);
+		nextReflected = this->getRandomRay(ray, root, angleVector);
+
+		//Oren-Nayar
+		float alpha = std::max(angleVector.x, angleVector.z);
+		float beta = std::min(angleVector.x, angleVector.z);
+		float orenNayarBRDF = A + B * std::max(0.0f, cos(angleVector.y - angleVector.w)) * sin(alpha) * sin(beta);
+
+		if (glm::vec3(nextReflected.getStartPoint()) != glm::vec3(0.0f) && glm::vec3(nextReflected.getEndPoint()) != glm::vec3(0.0f)) {
+			root->R = new Intersection();
+			ray++;
+			nextReflected.setDepth(ray.getdepth());
+			reflectCof = obj.getMaterial().getReflectCof();
+
+			reflectedLight = (reflectCof * orenNayarBRDF) * (this->getIntersection(nextReflected, root->R, inside));
 		}
 	}
 
@@ -378,7 +412,7 @@ glm::vec3 Scene::calculateDirectLight(Intersection* root, bool & inside) {
 	return Ld;
 }
 
-Ray Scene::getRandomRay(Ray ray, Intersection* root) {
+Ray Scene::getRandomRay(Ray ray, Intersection* root, glm::vec4 &angleVector) {
 	float pi = 3.1415926535897f;
 	float rand1, rand2 = 0.0f;
 	float terminate = 0.25f;
@@ -404,12 +438,19 @@ Ray Scene::getRandomRay(Ray ray, Intersection* root) {
 		random_direction = N;
 	}
 
+	
+
 	float inclination = asin(sqrt(rand1));
 	float azimuth = 0.0f;
 	if(rand2 <= (1.0f - terminate))
 		azimuth = 2.0f * pi / (rand2);
 	else return  Ray(glm::vec3(0.0f), glm::vec3(0.0f));
 
+	//Store in and out inclination and azimuth angles
+	angleVector.x = glm::dot(ray.getDirection(), N);
+	angleVector.y = 0.0f;
+	angleVector.z = inclination;
+	angleVector.w = azimuth;
 	
 	random_direction = glm::normalize(glm::rotate(
 		random_direction,

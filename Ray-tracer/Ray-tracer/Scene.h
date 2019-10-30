@@ -32,7 +32,8 @@ public:
 
 	glm::vec3 calculateDirectLight(Intersection* root, bool&);
 
-	Ray getRandomRay(Ray ray, Intersection* leaf);
+	Ray getRandomRay(Ray ray, Intersection* leaf, glm::vec4&);
+
 	glm::vec3 getIntersection(Ray ray, Intersection* root, bool&);
 	template <class T>
 	glm::vec3 getLightContribution(Ray, Intersection*, T, bool&);
@@ -53,6 +54,6 @@ private:
 	Tetrahedron tetrahedron;
 	Triangle triangles[30];
 
-	Sphere spheres[3];
+	Sphere spheres[4];
 };
 
