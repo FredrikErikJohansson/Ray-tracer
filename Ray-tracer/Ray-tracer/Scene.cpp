@@ -235,13 +235,11 @@ glm::vec3 Scene::getIntersection(Ray ray, Intersection* root, bool &inside) {
 
 	if (ray.getdepth() < 10) {
 		if (root->closest == "TRIANGLE") {
-			if(root->triangle.getMaterial().getType() != "LIGHT")
-				indirectLight = this->getLightContribution(ray, root, root->triangle, inside);
+			indirectLight = this->getLightContribution(ray, root, root->triangle, inside);
 			
 		}			
 		else if (root->closest == "SPHERE") {
-			if (root->sphere.getMaterial().getType() != "LIGHT")
-				indirectLight = this->getLightContribution(ray, root, root->sphere, inside);		
+			indirectLight = this->getLightContribution(ray, root, root->sphere, inside);		
 		}		
 	}
 
